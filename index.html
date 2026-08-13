@@ -17,6 +17,7 @@
   --plus:#1c6b4b; --minus:#9c3a2c; --warn:#8a5a00; --warn-bg:#fdf6e6;
   --bar-plus:#2f7d5c; --bar-minus:#a8503f; --fokus:#1f4e79;
   --schatten:0 1px 2px rgba(16,24,32,.06),0 1px 8px rgba(16,24,32,.05);
+  --z-blau:#e7eff8; --z-gelb:#fbf2dd; --z-gruen:#e4f1e8; --z-rot:#fae9e6;
 }
 :root[data-theme="dunkel"]{
   --bg:#111417; --surface:#1a1e22; --surface2:#20252a; --text:#e6eaee; --muted:#98a3ae;
@@ -24,6 +25,7 @@
   --plus:#6cc79b; --minus:#e58f7d; --warn:#d9a83f; --warn-bg:#2a2413;
   --bar-plus:#3d9a72; --bar-minus:#b8604c; --fokus:#7fb3e0;
   --schatten:0 1px 2px rgba(0,0,0,.4);
+  --z-blau:#16222f; --z-gelb:#282213; --z-gruen:#152719; --z-rot:#2c1a17;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="hell"]){
@@ -32,6 +34,7 @@
     --plus:#6cc79b; --minus:#e58f7d; --warn:#d9a83f; --warn-bg:#2a2413;
     --bar-plus:#3d9a72; --bar-minus:#b8604c; --fokus:#7fb3e0;
     --schatten:0 1px 2px rgba(0,0,0,.4);
+    --z-blau:#16222f; --z-gelb:#282213; --z-gruen:#152719; --z-rot:#2c1a17;
   }
 }
 *{box-sizing:border-box}
@@ -142,7 +145,9 @@ code{background:var(--surface2);border:1px solid var(--line);border-radius:4px;p
 .kacheln .v{font-size:19px;font-weight:640;margin-top:2px}
 .p{color:var(--plus)} .m{color:var(--minus)}
 
-.tabwrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface);-webkit-overflow-scrolling:touch}
+/* Hoehe so begrenzt, dass der Kasten samt fixierter Kopfzeile ganz auf den Schirm passt;
+   gescrollt wird dann innerhalb der Tabelle, die Kopfzeile bleibt dabei stehen. */
+.tabwrap{overflow:auto;max-height:calc(100vh - 124px);border:1px solid var(--line);border-radius:10px;background:var(--surface);-webkit-overflow-scrolling:touch}
 table.monat{border-collapse:separate;border-spacing:0;width:100%;font-size:13px;table-layout:fixed;min-width:1178px}
 /* Feste Spaltenbreiten: sonst schiebt die automatische Verteilung den gesamten
    Ueberschuss in die Datumsspalte, die als fixierte Spalte dauerhaft Platz kostet. */
@@ -160,26 +165,27 @@ table.monat th:nth-child(11),table.monat td:nth-child(11){width:58px}
 table.monat th:nth-child(12),table.monat td:nth-child(12){width:52px}
 table.monat th:nth-child(13),table.monat td:nth-child(13){width:48px}
 table.monat th:nth-child(14),table.monat td:nth-child(14){width:78px}
-table.monat th:nth-child(15),table.monat td:nth-child(15){width:120px}
-table.monat th{position:sticky;top:0;z-index:2;background:var(--surface2);text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:9px 5px;border-bottom:1px solid var(--line-stark);white-space:nowrap}
+/* Notiz-Spalte bewusst ohne Breite: sie nimmt den Ueberschuss auf, damit die
+   fixierten Spalten 1 und 2 exakt bei 86 px bzw. 32 px bleiben (sonst stimmt left nicht). */
+table.monat th{position:sticky;top:0;z-index:4;background:var(--surface2);text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:9px 5px;border-bottom:1px solid var(--line-stark);white-space:nowrap}
 table.monat td{padding:3px 5px;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle;height:42px}
 table.monat tr:last-child td{border-bottom:none}
-table.monat tr.frei td{background:var(--surface2);color:var(--muted)}
-table.monat tr.heute td{background:var(--akzent-weich)}
-table.monat tr.blink td{animation:blink 1.6s ease}
+/* Fixiert: Datum (Spalte 1) und Wochentag (Spalte 2) bleiben beim Querscrollen links stehen.
+   left muss exakt der Breite von Spalte 1 entsprechen (86 px, siehe oben). */
+table.monat th:nth-child(1),table.monat td:nth-child(1){position:sticky;left:0;z-index:3;background:var(--surface)}
+table.monat th:nth-child(2),table.monat td:nth-child(2){position:sticky;left:86px;z-index:3;background:var(--surface);box-shadow:1px 0 0 var(--line-stark)}
+/* Ecke: die fixierte Kopfzeile muss ueber den fixierten Spalten liegen */
+table.monat th:nth-child(1),table.monat th:nth-child(2){z-index:5;background:var(--surface2)}
+/* Zeilenfarben — treffen alle Zellen der Zeile, also auch die fixierten Spalten */
+table.monat tr.z-blau td{background:var(--z-blau)}
+table.monat tr.z-gelb td{background:var(--z-gelb)}
+table.monat tr.z-gruen td{background:var(--z-gruen)}
+table.monat tr.z-rot td{background:var(--z-rot)}
+table.monat tr.frei td{color:var(--muted)}
+/* Klassenname bewusst nicht "heute": den belegt bereits das Kachelraster der Stempeluhr (display:grid). */
+table.monat tr.tag-heute td:nth-child(1){box-shadow:inset 3px 0 0 var(--akzent)}
+table.monat tr.blink td:nth-child(n+3){animation:blink 1.6s ease}
 @keyframes blink{0%,40%{background:var(--akzent-weich)}100%{background:transparent}}
-/* Datumsspalte bleibt beim Querscrollen links stehen */
-table.monat th:first-child,
-table.monat td:first-child{
-  position:sticky;left:0;z-index:3;background:var(--surface);
-  box-shadow:1px 0 0 var(--line-stark);
-  width:88px;min-width:88px;
-}
-table.monat th:first-child{z-index:4;background:var(--surface2)}
-table.monat tr.frei td:first-child{background:var(--surface2)}
-table.monat tr.heute td:first-child{background:var(--akzent-weich)}
-table.monat tr.blink td:first-child{animation:blinkfest 1.6s ease}
-@keyframes blinkfest{0%,40%{background:var(--akzent-weich)}100%{background:var(--surface)}}
 table.monat td.r{text-align:right}
 .calc{color:var(--muted)}
 .calc.stark{color:var(--text);font-weight:600}
@@ -246,6 +252,7 @@ input.kurz{max-width:150px}
 .jahrtab td{padding:9px 8px;border-bottom:1px solid var(--line)}
 .jahrtab tr.jetzt td{font-weight:650}
 .legende{color:var(--muted);font-size:12.5px;margin-top:10px}
+.farbchip{display:inline-block;width:13px;height:13px;border-radius:3px;border:1px solid var(--line-stark);vertical-align:-2px;margin-right:5px}
 
 #druckkopf{display:none}
 .unterschrift{display:none}
@@ -259,16 +266,19 @@ input.kurz{max-width:150px}
   #druckkopf .dtitel{font-size:15pt;font-weight:700}
   #druckkopf .dzeile{font-size:9.5pt;margin-top:1.5mm}
   .karte{border:none;box-shadow:none;background:#fff}
-  .tabwrap{overflow:visible;border:1px solid #888;border-radius:0}
-  table.monat{min-width:0;font-size:8pt;table-layout:auto}
+  .tabwrap{overflow:visible;max-height:none;border:1px solid #888;border-radius:0}
+  table.monat{min-width:0;font-size:8pt;table-layout:auto;print-color-adjust:exact;-webkit-print-color-adjust:exact}
   table.monat th,table.monat td{width:auto!important}
   table.monat th{background:#eee;color:#000;position:static;border-bottom:1px solid #666;padding:2px 3px;font-size:7pt}
   table.monat td{padding:1px 3px;height:auto;border-bottom:1px solid #ddd}
-  table.monat tr.frei td{background:#f5f5f5;color:#444}
-  table.monat th:first-child{position:static;box-shadow:none;background:#eee}
-  table.monat td:first-child{position:static;box-shadow:none;background:none}
-  table.monat tr.frei td:first-child{background:#f5f5f5}
-  table.monat tr.heute td{background:#fff}
+  table.monat tr.frei td{color:#444}
+  table.monat th:nth-child(1),table.monat th:nth-child(2){position:static;box-shadow:none;background:#eee}
+  table.monat td:nth-child(1),table.monat td:nth-child(2){position:static;box-shadow:none;background:none}
+  table.monat tr.tag-heute td:nth-child(1){box-shadow:none}
+  table.monat tr.z-blau td{background:#eaf0f7}
+  table.monat tr.z-gelb td{background:#faf3e1}
+  table.monat tr.z-gruen td{background:#e9f3ec}
+  table.monat tr.z-rot td{background:#fbeeeb}
   table.monat input.t{border:none;background:none;width:34px;padding:0;color:#000;min-height:0;font-size:8pt}
   .artbtn,.notizbtn{border:none;padding:0;color:#000;max-width:none}
   .bar,.mark{display:none}
@@ -1138,6 +1148,12 @@ function zeichneMonat(){
    +'</tr></thead><tbody id="tbody">';
   b.tage.forEach(function(r){ h+=zeile(r,b.maxAbs); });
   h+='</tbody></table></div>';
+  h+='<div class="legende noprint" style="margin-bottom:6px">'
+   +'<span class="farbchip" style="background:var(--z-gruen)"></span>Tagessoll erfüllt&nbsp;&nbsp;'
+   +'<span class="farbchip" style="background:var(--z-rot)"></span>Tagessoll unterschritten&nbsp;&nbsp;'
+   +'<span class="farbchip" style="background:var(--z-gelb)"></span>Urlaub, Krank, Feiertag, Gleittag&nbsp;&nbsp;'
+   +'<span class="farbchip" style="background:var(--z-blau)"></span>Wochenende'
+   +'</div>';
   h+='<div class="legende noprint">Berechnete Werte stehen in gedämpfter Schrift. <span class="stift">✎</span> = manuell gesetzte Tagesart, '
    +'<span class="mark" style="vertical-align:baseline">K</span> = Zeitkorrektur aus „Sonstige Ergänzungen“, '
    +'<span class="mark" style="vertical-align:baseline">P</span> = private Unterbrechung, '
@@ -1159,10 +1175,22 @@ function warnHtml(b,kw){
   });
   return h+'</ul></div>';
 }
+/* Farbliche Kennzeichnung der Zeile.
+   Reihenfolge zaehlt: Wochenende schlaegt alles, dann abwesende Tage, erst danach der Saldo. */
+function zeilenFarbe(r){
+  if(r.dow===0 || r.dow===6 || r.art==="wochenende") return "z-blau";
+  if(r.art!=="arbeit") return "z-gelb";          /* Urlaub, Krank, Feiertag, Gleittag, Fortbildung, Sonderurlaub */
+  if(r.vorStichtag) return "";                   /* zaehlt nicht ins Konto */
+  if(r.key>heuteKey()) return "";                /* kuenftige Tage nicht vorab rot faerben */
+  return r.saldo>=0 ? "z-gruen" : "z-rot";
+}
+function zeilenKlassen(r){
+  var frei=(r.art==="wochenende"||r.art==="feiertag");
+  return (frei?"frei ":"")+(r.key===heuteKey()?"tag-heute ":"")+zeilenFarbe(r);
+}
 function zeile(r,maxAbs){
   var t=state.tage[r.key]||{};
-  var frei=(r.art==="wochenende"||r.art==="feiertag");
-  var cls=(frei?"frei ":"")+(r.key===heuteKey()?"heute":"");
+  var cls=zeilenKlassen(r);
   var p1=r.pausen[0], d1=r.dienstgaenge[0];
   var extraP=r.pausen.length>1?'<span class="mark" title="'+r.pausen.length+' Pausen — im Tagesdetail">+'+(r.pausen.length-1)+'</span>':'';
   var extraD=r.dienstgaenge.length>1?'<span class="mark" title="'+r.dienstgaenge.length+' Dienstgänge — im Tagesdetail">+'+(r.dienstgaenge.length-1)+'</span>':'';
@@ -1214,6 +1242,7 @@ function sollZelle(r){
 }
 function saldoZelle(r,maxAbs){
   if(ausserhalb(r)) return '<span class="calc" title="Liegt vor dem Stichtag — zählt nicht ins Konto.">–</span>';
+  if(r.key>heuteKey()) return '<span class="calc" title="Liegt in der Zukunft — noch nicht gewertet.">–</span>';
   var m=Math.max(maxAbs,60);
   var w=Math.min(50, Math.abs(r.saldo)/m*50);
   var txt=(r.hatDaten||r.saldo)?'<span class="'+(r.saldo>0?"p":r.saldo<0?"m":"")+'" style="font-weight:600">'+fmtSaldo(r.saldo)+'</span>':'';
@@ -1311,6 +1340,7 @@ function livePatch(key){
     q(".c-saldo").innerHTML  = saldoZelle(r,b.maxAbs);
     var wm=r.warnungen.some(function(x){return x.typ==="warn";})?'<span class="mark" title="Warnung — Tagesdetail öffnen">!</span>':'';
     q(".c-art").innerHTML    = artZelle(r,wm);
+    tr.className             = zeilenKlassen(r);   /* Farbe sofort mitziehen */
   }
   var kach=document.querySelector(".kacheln");
   if(kach) kach.innerHTML=kachelnHtml(b,kontostandBis(letzterTagKey()));
