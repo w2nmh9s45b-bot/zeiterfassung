@@ -18,6 +18,11 @@
   --bar-plus:#2f7d5c; --bar-minus:#a8503f; --fokus:#1f4e79;
   --schatten:0 1px 2px rgba(16,24,32,.06),0 1px 8px rgba(16,24,32,.05);
   --z-blau:#e7eff8; --z-gelb:#fbf2dd; --z-gruen:#a4e6b8; --z-rot:#ffb0a6;
+  --woche-bg:#dde9f5;
+  --kopf-bg:#1f4e79; --kopf-text:#ffffff; --kopf-weich:rgba(255,255,255,.16);
+  --tint-plus:#e8f6ee; --tint-minus:#fdecea; --tint-akzent:#eef4fa;
+  /* Vollflaechige Varianten — immer mit weisser Schrift verwendbar, in beiden Modi */
+  --akzent-voll:#1f4e79; --plus-voll:#1c7a52; --minus-voll:#a83c2c; --warn-voll:#96690f;
 }
 :root[data-theme="dunkel"]{
   --bg:#111417; --surface:#1a1e22; --surface2:#20252a; --text:#e6eaee; --muted:#98a3ae;
@@ -26,6 +31,10 @@
   --bar-plus:#3d9a72; --bar-minus:#b8604c; --fokus:#7fb3e0;
   --schatten:0 1px 2px rgba(0,0,0,.4);
   --z-blau:#16222f; --z-gelb:#282213; --z-gruen:#1f6b3d; --z-rot:#7a2b21;
+    --woche-bg:#1c2c3d;
+    --kopf-bg:#152232; --kopf-text:#e9eef4; --kopf-weich:rgba(255,255,255,.10);
+    --tint-plus:#16261d; --tint-minus:#2a1b18; --tint-akzent:#1a2531;
+    --akzent-voll:#2f6ea8; --plus-voll:#2a8f63; --minus-voll:#bd4f3c; --warn-voll:#9d7418;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="hell"]){
@@ -35,6 +44,10 @@
     --bar-plus:#3d9a72; --bar-minus:#b8604c; --fokus:#7fb3e0;
     --schatten:0 1px 2px rgba(0,0,0,.4);
     --z-blau:#16222f; --z-gelb:#282213; --z-gruen:#1f6b3d; --z-rot:#7a2b21;
+    --woche-bg:#1c2c3d;
+    --kopf-bg:#152232; --kopf-text:#e9eef4; --kopf-weich:rgba(255,255,255,.10);
+    --tint-plus:#16261d; --tint-minus:#2a1b18; --tint-akzent:#1a2531;
+    --akzent-voll:#2f6ea8; --plus-voll:#2a8f63; --minus-voll:#bd4f3c; --warn-voll:#9d7418;
   }
 }
 *{box-sizing:border-box}
@@ -48,11 +61,17 @@ body{
 button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--fokus);outline-offset:2px}
 
-.topbar{position:sticky;top:0;z-index:30;background:var(--surface);border-bottom:1px solid var(--line);padding:env(safe-area-inset-top) 0 0 0}
+.topbar{position:sticky;top:0;z-index:30;background:var(--kopf-bg);color:var(--kopf-text);border-bottom:1px solid rgba(0,0,0,.18);padding:env(safe-area-inset-top) 0 0 0;box-shadow:0 1px 6px rgba(16,24,32,.18)}
 .topbar-in{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:8px 14px;min-height:52px}
 .marke{font-weight:650;letter-spacing:.01em;font-size:15px;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
-.marke span{color:var(--muted);font-weight:400}
+.marke span{color:rgba(255,255,255,.62);font-weight:400}
 .nav{margin-left:auto;display:flex;gap:6px;align-items:center;flex:0 0 auto}
+.nav a{color:rgba(255,255,255,.80)}
+.nav a:hover{background:var(--kopf-weich);color:#fff}
+.nav a.aktiv{background:#fff;color:var(--kopf-bg);border-color:transparent;font-weight:650}
+.topbar .iconbtn{background:var(--kopf-weich);border-color:transparent;color:rgba(255,255,255,.85)}
+.topbar .iconbtn:hover{background:rgba(255,255,255,.28);color:#fff}
+.topbar a.iconbtn.aktiv{background:#fff;color:var(--kopf-bg)}
 @media(max-width:560px){
   .topbar-in{gap:8px;padding:8px 10px}
   .marke{font-size:14px}
@@ -81,10 +100,13 @@ code{background:var(--surface2);border:1px solid var(--line);border-radius:4px;p
 #banner{display:none;margin:0;padding:10px 14px;background:var(--warn-bg);color:var(--warn);border-bottom:1px solid var(--line);font-size:13.5px;font-weight:550}
 #banner.an{display:block}
 
-.status{padding:18px;display:flex;flex-direction:column;gap:2px;border-left:4px solid var(--line-stark);border-radius:12px}
-.status[data-z="arbeit"]{border-left-color:var(--plus)}
-.status[data-z="pause"]{border-left-color:var(--warn)}
-.status[data-z="dienstgang"]{border-left-color:var(--akzent)}
+.status{padding:18px;display:flex;flex-direction:column;gap:2px;border-left:5px solid var(--line-stark);border-radius:12px}
+.status[data-z="arbeit"]{border-left-color:var(--plus-voll);background:var(--tint-plus)}
+.status[data-z="pause"]{border-left-color:var(--warn-voll);background:var(--z-gelb)}
+.status[data-z="dienstgang"]{border-left-color:var(--akzent-voll);background:var(--tint-akzent)}
+.status[data-z="arbeit"] .marker{background:var(--plus-voll);border-color:transparent;color:#fff}
+.status[data-z="pause"] .marker{background:var(--warn-voll);border-color:transparent;color:#fff}
+.status[data-z="dienstgang"] .marker{background:var(--akzent-voll);border-color:transparent;color:#fff}
 .status .zeile1{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .status .zustand{font-size:23px;font-weight:650;letter-spacing:-.01em}
 .status .marker{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);color:var(--muted)}
@@ -96,12 +118,14 @@ code{background:var(--surface2);border:1px solid var(--line);border-radius:4px;p
 .taste:active{transform:scale(.985)}
 .taste svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .taste[disabled]{opacity:.36;cursor:not-allowed;box-shadow:none}
-.taste.kommen:not([disabled]){border-color:var(--plus);color:var(--plus)}
-.taste.gehen:not([disabled]){border-color:var(--minus);color:var(--minus)}
-.taste.pause:not([disabled]){border-color:var(--warn);color:var(--warn)}
-.taste.dienstgang:not([disabled]){border-color:var(--akzent);color:var(--akzent)}
+.taste.kommen:not([disabled]){background:var(--plus-voll);border-color:transparent;color:#fff}
+.taste.gehen:not([disabled]){background:var(--minus-voll);border-color:transparent;color:#fff}
+.taste.pause:not([disabled]){background:var(--warn-voll);border-color:transparent;color:#fff}
+.taste.dienstgang:not([disabled]){background:var(--akzent-voll);border-color:transparent;color:#fff}
+.taste:not([disabled]){box-shadow:0 2px 6px rgba(16,24,32,.20)}
+.taste[disabled]{background:var(--surface2);color:var(--muted)}
 .taste.blitz{animation:blitz .5s ease}
-@keyframes blitz{0%{background:var(--akzent-weich)}100%{background:var(--surface)}}
+@keyframes blitz{0%{box-shadow:inset 0 0 0 120px rgba(255,255,255,.45)}100%{box-shadow:inset 0 0 0 120px rgba(255,255,255,0)}}
 
 #toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--surface);border:1px solid var(--line-stark);border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.18);padding:10px 12px;display:none;align-items:center;gap:12px;z-index:60;max-width:calc(100vw - 28px);font-size:14px}
 #toast.an{display:flex}
@@ -111,7 +135,8 @@ code{background:var(--surface2);border:1px solid var(--line);border-radius:4px;p
 .konto .gross{font-size:40px;font-weight:680;letter-spacing:-.02em;line-height:1.05}
 .konto .gross.p{color:var(--plus)} .konto .gross.m{color:var(--minus)}
 .konto .neben{color:var(--muted);font-size:14px;padding-bottom:6px}
-.label{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.label{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--akzent);margin-bottom:6px}
+h2{color:var(--akzent)}
 
 .heute{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:1px;background:var(--line);border-radius:10px;overflow:hidden;border:1px solid var(--line)}
 .heute > div{background:var(--surface);padding:12px 14px}
@@ -133,16 +158,21 @@ code{background:var(--surface2);border:1px solid var(--line);border-radius:4px;p
 .monatsleiste .titel{font-size:19px;font-weight:650;min-width:180px}
 .btn{border:1px solid var(--line-stark);background:var(--surface);border-radius:8px;min-height:38px;padding:0 12px;cursor:pointer;font-size:14px;font-weight:550}
 .btn:hover{background:var(--surface2)}
-.btn.prim{background:var(--akzent);color:#fff;border-color:var(--akzent)}
+.btn.prim{background:var(--akzent-voll);color:#fff;border-color:transparent}
 .btn.gefahr{color:var(--minus);border-color:var(--minus)}
-.reiter{display:flex;gap:4px;margin-bottom:14px;border-bottom:1px solid var(--line)}
-.reiter button{background:none;border:none;border-bottom:2px solid transparent;padding:9px 14px;cursor:pointer;font-weight:600;color:var(--muted);font-size:14.5px}
-.reiter button.aktiv{color:var(--text);border-bottom-color:var(--akzent)}
+.reiter{display:inline-flex;gap:3px;margin-bottom:14px;background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:3px}
+.reiter button{background:none;border:none;border-radius:8px;padding:8px 20px;cursor:pointer;font-weight:600;color:var(--muted);font-size:14.5px}
+.reiter button:hover{color:var(--text)}
+.reiter button.aktiv{background:var(--akzent-voll);color:#fff;box-shadow:0 1px 3px rgba(16,24,32,.25)}
 
-.kacheln{display:grid;grid-template-columns:repeat(auto-fit,minmax(124px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:14px}
+/* 9 Kacheln: nur Spaltenzahlen verwenden, die aufgehen (3 oder 9) — sonst bleibt ein grauer Rest */
+.kacheln{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:14px}
+@media(min-width:1000px){.kacheln{grid-template-columns:repeat(9,1fr)}}
 .kacheln > div{background:var(--surface);padding:11px 13px}
 .kacheln .k{font-size:11px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;font-weight:700;min-height:30px}
 .kacheln .v{font-size:19px;font-weight:640;margin-top:2px}
+.kacheln > div.kp{background:var(--tint-plus)}
+.kacheln > div.km{background:var(--tint-minus)}
 .p{color:var(--plus)} .m{color:var(--minus)}
 
 /* Hoehe so begrenzt, dass der Kasten samt fixierter Kopfzeile ganz auf den Schirm passt;
@@ -189,6 +219,15 @@ table.monat tr.z-gruen .bar,table.monat tr.z-rot .bar{background:rgba(0,0,0,.12)
 table.monat tr.frei td{color:var(--muted)}
 /* Klassenname bewusst nicht "heute": den belegt bereits das Kachelraster der Stempeluhr (display:grid). */
 table.monat tr.tag-heute td:nth-child(1){box-shadow:inset 3px 0 0 var(--akzent)}
+/* Wochensumme: deutlich abgesetztes Band nach jeder Kalenderwoche */
+table.monat tr.wochenzeile td{
+  background:var(--woche-bg);color:var(--text);font-weight:700;height:36px;
+  border-top:2px solid var(--akzent);border-bottom:2px solid var(--akzent);
+}
+table.monat tr.wochenzeile td:nth-child(1){letter-spacing:.04em}
+table.monat tr.wochenzeile td:nth-child(3){
+  font-weight:650;font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--akzent);
+}
 table.monat tr.blink td:nth-child(n+3){animation:blink 1.6s ease}
 @keyframes blink{0%,40%{background:var(--akzent-weich)}100%{background:transparent}}
 table.monat td.r{text-align:right}
@@ -282,8 +321,11 @@ input.kurz{max-width:150px}
   table.monat tr.tag-heute td:nth-child(1){box-shadow:none}
   table.monat tr.z-blau td{background:#eaf0f7}
   table.monat tr.z-gelb td{background:#faf3e1}
-  table.monat tr.z-gruen td{background:#bfe8cd}
-  table.monat tr.z-rot td{background:#ffc7bf}
+  table.monat tr.z-gruen td{background:#a4e6b8}
+  table.monat tr.z-rot td{background:#ffb0a6}
+  table.monat tr.wochenzeile td{background:#dfe8f2;color:#000;font-weight:700;
+    border-top:1.4px solid #1f4e79;border-bottom:1.4px solid #1f4e79}
+  table.monat tr.wochenzeile td:nth-child(3){color:#1f4e79;font-size:7pt;letter-spacing:.06em}
   table.monat input.t{border:none;background:none;width:34px;padding:0;color:#000;min-height:0;font-size:8pt}
   /* Spaltentrenner: feine Linie zwischen allen Spalten, kraeftige an den Gruppengrenzen
      (Datum+Tag | Art | Kommen+Gehen | Pause | Dienstgang | Berechnung | Notiz) */
@@ -304,7 +346,9 @@ input.kurz{max-width:150px}
   table.monat tr{break-inside:avoid}
   /* Monatskennzahlen als eine saubere Reihe statt mit Umbruch */
   .kacheln{grid-template-columns:repeat(9,1fr);margin-bottom:4mm}
-  .kacheln > div{padding:3px 5px}
+  .kacheln > div{padding:3px 5px;background:#fff}
+  .kacheln > div.kp{background:#e3f4ea}
+  .kacheln > div.km{background:#fde7e3}
   .kacheln .k{font-size:6pt;min-height:20px;letter-spacing:.02em}
   .kacheln .v{font-size:9.5pt;margin-top:0}
   .artbtn,.notizbtn{border:none;padding:0;color:#000;max-width:none}
@@ -1135,7 +1179,10 @@ function zeichneInfo(){
   if(ansicht.reiter==="monat") zeichneMonat(); else zeichneJahr();
 }
 
-function kachel(k,v,cls){ return '<div><div class="k">'+esc(k)+'</div><div class="v '+cls+'">'+esc(v)+'</div></div>'; }
+function kachel(k,v,cls){
+  var tint = cls==="p" ? " kp" : cls==="m" ? " km" : "";
+  return '<div class="kachel'+tint+'"><div class="k">'+esc(k)+'</div><div class="v '+cls+'">'+esc(v)+'</div></div>';
+}
 function kachelnHtml(b,kEnde){
   return kachel("Soll"+(b.kuenftig?" bis heute":""), fmtDauer(b.soll)+" h","")
    +kachel("Ist", fmtDauer(b.ist)+" h","")
@@ -1176,7 +1223,10 @@ function zeichneMonat(){
    +'<th>Pause</th><th class="r">Pause h</th><th>Dienstgang</th><th class="r">Dg. h</th>'
    +'<th class="r">Brutto</th><th class="r">Abzug</th><th class="r">Ist</th><th class="r">Soll</th><th class="r">Saldo</th><th>Notiz</th>'
    +'</tr></thead><tbody id="tbody">';
-  b.tage.forEach(function(r){ h+=zeile(r,b.maxAbs); });
+  wochenBloecke(b.tage).forEach(function(bl){
+    bl.tage.forEach(function(r){ h+=zeile(r,b.maxAbs); });
+    h+=wochenZeile(bl);
+  });
   h+='</tbody></table></div>';
   h+='<div class="legende noprint" style="margin-bottom:6px">'
    +'<span class="farbchip" style="background:var(--z-gruen)"></span>Tagessoll erfüllt&nbsp;&nbsp;'
@@ -1217,6 +1267,39 @@ function zeilenFarbe(r){
 function zeilenKlassen(r){
   var frei=(r.art==="wochenende"||r.art==="feiertag");
   return (frei?"frei ":"")+(r.key===heuteKey()?"tag-heute ":"")+zeilenFarbe(r);
+}
+/* Tage des Monats in Kalenderwochen buendeln (nur die Tage, die im Monat liegen) */
+function wochenBloecke(tage){
+  var out=[], akt=null;
+  tage.forEach(function(r){
+    var wk=isoWocheKey(dateOf(r.key));
+    if(!akt || akt.wk!==wk){ akt={wk:wk, tage:[]}; out.push(akt); }
+    akt.tage.push(r);
+  });
+  return out;
+}
+function wochenSumme(bl){
+  var hk=heuteKey(), s={ist:0,soll:0,saldo:0,gezaehlt:0};
+  bl.tage.forEach(function(r){
+    if(r.key<=hk){ s.ist+=r.ist; s.soll+=r.soll; s.saldo+=r.saldo; s.gezaehlt++; }
+  });
+  return s;
+}
+function wochenZellen(bl){
+  var s=wochenSumme(bl);
+  var von=bl.tage[0].key, bis=bl.tage[bl.tage.length-1].key;
+  var kw=bl.wk.split("-")[1];
+  var saldoTxt = s.gezaehlt
+    ? '<span class="'+(s.saldo>0?"p":s.saldo<0?"m":"")+'">'+fmtSaldo(s.saldo)+'</span>'
+    : '–';
+  return '<td>'+esc(kw)+'</td><td></td>'
+   +'<td colspan="9">Wochensumme '+esc(fmtDatumKurz(von))+' – '+esc(fmtDatumKurz(bis))+'</td>'
+   +'<td class="r">'+(s.gezaehlt?fmtDauer(s.ist):"–")+'</td>'
+   +'<td class="r">'+(s.gezaehlt?fmtDauer(s.soll):"–")+'</td>'
+   +'<td class="r">'+saldoTxt+'</td><td></td>';
+}
+function wochenZeile(bl){
+  return '<tr class="wochenzeile" data-woche="'+bl.wk+'">'+wochenZellen(bl)+'</tr>';
 }
 function zeile(r,maxAbs){
   var t=state.tage[r.key]||{};
@@ -1372,6 +1455,11 @@ function livePatch(key){
     q(".c-art").innerHTML    = artZelle(r,wm);
     tr.className             = zeilenKlassen(r);   /* Farbe sofort mitziehen */
   }
+  /* Wochensummen neu rechnen, sonst stehen sie nach einer Aenderung falsch da */
+  wochenBloecke(b.tage).forEach(function(bl){
+    var wr=document.querySelector('tr[data-woche="'+bl.wk+'"]');
+    if(wr) wr.innerHTML=wochenZellen(bl);
+  });
   var kach=document.querySelector(".kacheln");
   if(kach) kach.innerHTML=kachelnHtml(b,kontostandBis(letzterTagKey()));
   var wb=document.getElementById("warnBox");
