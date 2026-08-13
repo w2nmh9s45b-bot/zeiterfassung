@@ -143,7 +143,24 @@ code{background:var(--surface2);border:1px solid var(--line);border-radius:4px;p
 .p{color:var(--plus)} .m{color:var(--minus)}
 
 .tabwrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface);-webkit-overflow-scrolling:touch}
-table.monat{border-collapse:separate;border-spacing:0;width:100%;font-size:13px;min-width:1120px}
+table.monat{border-collapse:separate;border-spacing:0;width:100%;font-size:13px;table-layout:fixed;min-width:1178px}
+/* Feste Spaltenbreiten: sonst schiebt die automatische Verteilung den gesamten
+   Ueberschuss in die Datumsspalte, die als fixierte Spalte dauerhaft Platz kostet. */
+table.monat th:nth-child(1),table.monat td:nth-child(1){width:86px}
+table.monat th:nth-child(2),table.monat td:nth-child(2){width:32px}
+table.monat th:nth-child(3),table.monat td:nth-child(3){width:128px}
+table.monat th:nth-child(4),table.monat td:nth-child(4),
+table.monat th:nth-child(5),table.monat td:nth-child(5){width:66px}
+table.monat th:nth-child(6),table.monat td:nth-child(6),
+table.monat th:nth-child(8),table.monat td:nth-child(8){width:140px}
+table.monat th:nth-child(7),table.monat td:nth-child(7){width:56px}
+table.monat th:nth-child(9),table.monat td:nth-child(9){width:46px}
+table.monat th:nth-child(10),table.monat td:nth-child(10){width:62px}
+table.monat th:nth-child(11),table.monat td:nth-child(11){width:58px}
+table.monat th:nth-child(12),table.monat td:nth-child(12){width:52px}
+table.monat th:nth-child(13),table.monat td:nth-child(13){width:48px}
+table.monat th:nth-child(14),table.monat td:nth-child(14){width:78px}
+table.monat th:nth-child(15),table.monat td:nth-child(15){width:120px}
 table.monat th{position:sticky;top:0;z-index:2;background:var(--surface2);text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:9px 5px;border-bottom:1px solid var(--line-stark);white-space:nowrap}
 table.monat td{padding:3px 5px;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle;height:42px}
 table.monat tr:last-child td{border-bottom:none}
@@ -151,6 +168,18 @@ table.monat tr.frei td{background:var(--surface2);color:var(--muted)}
 table.monat tr.heute td{background:var(--akzent-weich)}
 table.monat tr.blink td{animation:blink 1.6s ease}
 @keyframes blink{0%,40%{background:var(--akzent-weich)}100%{background:transparent}}
+/* Datumsspalte bleibt beim Querscrollen links stehen */
+table.monat th:first-child,
+table.monat td:first-child{
+  position:sticky;left:0;z-index:3;background:var(--surface);
+  box-shadow:1px 0 0 var(--line-stark);
+  width:88px;min-width:88px;
+}
+table.monat th:first-child{z-index:4;background:var(--surface2)}
+table.monat tr.frei td:first-child{background:var(--surface2)}
+table.monat tr.heute td:first-child{background:var(--akzent-weich)}
+table.monat tr.blink td:first-child{animation:blinkfest 1.6s ease}
+@keyframes blinkfest{0%,40%{background:var(--akzent-weich)}100%{background:var(--surface)}}
 table.monat td.r{text-align:right}
 .calc{color:var(--muted)}
 .calc.stark{color:var(--text);font-weight:600}
@@ -158,9 +187,9 @@ table.monat input.t{width:56px;min-height:32px;padding:3px 3px;border:1px solid 
 table.monat input.t:hover{border-color:var(--line)}
 table.monat input.t:focus{border-color:var(--fokus);background:var(--surface);outline:none}
 table.monat input.t::placeholder{color:var(--line-stark)}
-.artbtn{background:none;border:1px solid transparent;border-radius:6px;padding:4px 7px;cursor:pointer;font-size:12.5px;font-weight:600;color:inherit;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
+.artbtn{background:none;border:1px solid transparent;border-radius:6px;padding:4px 7px;cursor:pointer;font-size:12.5px;font-weight:600;color:inherit;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
 .artbtn:hover{border-color:var(--line);background:var(--surface2)}
-.notizbtn{background:none;border:1px solid transparent;border-radius:6px;padding:4px 7px;cursor:pointer;color:var(--muted);font-size:12.5px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;text-align:left;min-width:44px}
+.notizbtn{background:none;border:1px solid transparent;border-radius:6px;padding:4px 7px;cursor:pointer;color:var(--muted);font-size:12.5px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;text-align:left}
 .notizbtn:hover{border-color:var(--line);background:var(--surface2)}
 .mark{font-size:10px;font-weight:700;color:var(--warn);margin-left:3px;vertical-align:super;cursor:help}
 .stift{color:var(--muted);font-size:11px;margin-left:3px}
@@ -231,10 +260,14 @@ input.kurz{max-width:150px}
   #druckkopf .dzeile{font-size:9.5pt;margin-top:1.5mm}
   .karte{border:none;box-shadow:none;background:#fff}
   .tabwrap{overflow:visible;border:1px solid #888;border-radius:0}
-  table.monat{min-width:0;font-size:8pt}
+  table.monat{min-width:0;font-size:8pt;table-layout:auto}
+  table.monat th,table.monat td{width:auto!important}
   table.monat th{background:#eee;color:#000;position:static;border-bottom:1px solid #666;padding:2px 3px;font-size:7pt}
   table.monat td{padding:1px 3px;height:auto;border-bottom:1px solid #ddd}
   table.monat tr.frei td{background:#f5f5f5;color:#444}
+  table.monat th:first-child{position:static;box-shadow:none;background:#eee}
+  table.monat td:first-child{position:static;box-shadow:none;background:none}
+  table.monat tr.frei td:first-child{background:#f5f5f5}
   table.monat tr.heute td{background:#fff}
   table.monat input.t{border:none;background:none;width:34px;padding:0;color:#000;min-height:0;font-size:8pt}
   .artbtn,.notizbtn{border:none;padding:0;color:#000;max-width:none}
