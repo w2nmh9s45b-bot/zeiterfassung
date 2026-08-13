@@ -419,7 +419,7 @@ function standardEinstellungen(){
     rahmenVon: "06:00",
     rahmenBis: "19:00",
     rahmenPruefung: true,
-    kernzeitPruefung: true,
+    kernzeitPruefung: false,   /* aus: keine Meldungen zur Kernarbeitszeit */
     kernzeiten: {
       "0":[], "6":[],
       "1":[{von:"08:30",bis:"12:00"},{von:"14:00",bis:"16:00"}],
@@ -550,8 +550,18 @@ function berechneTag(key, tag, e, opt){
   /* --- 4. Pausenabzug --- */
   var gebucht = summe(pauIv);
   var stufen = (e.pausenstufen||[]).slice().sort(function(a,b){return a.grenze-b.grenze;});
-  var pflicht = 0;
-  for(var s1=0; s1<stufen.length; s1++) if(brutto > stufen[s1].grenze) pflicht = stufen[s1].pause;
+  /* Die Mindestpause laeuft AB der jeweiligen Grenze, sie wird nicht pauschal abgezogen.
+     Die Grenze bezieht sich auf die Arbeitszeit, liegt in der Anwesenheit also um die
+     bereits verbrauchte Pause spaeter. Beispiel 6-Stunden-Stufe: wer 6:01 anwesend ist,
+     verbraucht davon 1 Minute Pause (Arbeitszeit 6:00) — nicht 30 Minuten. */
+  var pflicht = 0, bisher = 0;
+  for(var s1=0; s1<stufen.length; s1++){
+    var zusatz = stufen[s1].pause - bisher;
+    if(zusatz <= 0) continue;
+    var pos = stufen[s1].grenze + bisher;   /* Zeitpunkt in der Anwesenheit, an dem die Grenze erreicht ist */
+    if(brutto > pos) pflicht += Math.min(zusatz, brutto - pos);
+    bisher = stufen[s1].pause;
+  }
   var abzug = Math.max(gebucht, pflicht);
 
   var zuschlag = 0, zuschlagInfo = "";
@@ -598,8 +608,10 @@ function berechneTag(key, tag, e, opt){
 
   /* --- Warnungen und Hinweise --- */
   if(gekappt>0) w("warn","Arbeitszeit auf "+fmtDauer(e.kappung)+" h gekappt — "+fmtDauer(gekappt)+" h fallen weg.");
-  if(brutto>0 && gebucht < pflicht)
-    w("warn","Gebuchte Pause ("+fmtDauer(gebucht)+" h) unter dem gesetzlichen Minimum von "+fmtDauer(pflicht)+" h (§ 4 ArbZG).");
+  /* Ist gar keine Pause gestempelt, wird die Mindestpause still automatisch abgezogen — keine Meldung.
+     Nur eine tatsaechlich gestempelte, zu kurze Pause wird als ruhiger Hinweis vermerkt. */
+  if(brutto>0 && gebucht>0 && gebucht < pflicht)
+    w("hinweis","Gestempelte Pause ("+fmtDauer(gebucht)+" h) ist kürzer als die Mindestpause von "+fmtDauer(pflicht)+" h — abgezogen wurden "+fmtDauer(pflicht)+" h (§ 4 ArbZG).");
   if(zuschlag>0) w("warn","Verspätungszuschlag "+fmtDauer(zuschlag)+" h — "+zuschlagInfo+".");
   if(offen && jetztMin!==null) w("hinweis","Eine Buchung läuft noch.");
 
@@ -651,6 +663,7 @@ function berechneTag(key, tag, e, opt){
     arbeitSumme:arbSum, dienstgangAussen:dgAussen, dienstgangSumme:summe(dgIv),
     korrektur:korrSum, korrekturen:korrList, privat:privSum,
     brutto:brutto, gebuchtePause:gebucht, pflichtPause:pflicht, zuschlag:zuschlag, zuschlagInfo:zuschlagInfo,
+    pauseAutomatisch:(gebucht===0 && pflicht>0),
     abzug:abzug, gekappt:gekappt, netto:netto, gutschrift:gutschrift,
     soll:soll, ist:ist, saldo:saldo, vorStichtag:vorStichtag,
     pausen:pauIv, dienstgaenge:dgIv, privatIv:privIv, arbeitIv:arbIv,
@@ -690,7 +703,7 @@ var KEY="zeiterfassung.v1";
 var speicherOk=true;
 var state=null, seq=0;
 
-function leererState(){ return {version:1, einstellungen:standardEinstellungen(), tage:{}}; }
+function leererState(){ return {version:2, einstellungen:standardEinstellungen(), tage:{}}; }
 
 function zeigeBanner(txt){
   var b=document.getElementById("banner");
@@ -716,6 +729,8 @@ function laden(){
         if(!std.kernzeiten||typeof std.kernzeiten!=="object") std.kernzeiten=standardEinstellungen().kernzeiten;
         if(!Array.isArray(std.arbeitstage)||std.arbeitstage.length!==7) std.arbeitstage=standardEinstellungen().arbeitstage;
         if(!Array.isArray(std.pausenstufen)||!std.pausenstufen.length) std.pausenstufen=standardEinstellungen().pausenstufen;
+        /* Fassung 2: Meldungen zur Kernarbeitszeit einmalig abschalten, auch bei aelterem Bestand */
+        if(!p.version || p.version < 2) std.kernzeitPruefung = false;
         s.einstellungen=std;
       }
     }catch(err){
@@ -1377,8 +1392,10 @@ function detailZeichnen(){
    +(r.korrektur?rz("Zeitkorrekturen", fmtSaldo(r.korrektur)+" h"):"")
    +(r.privat?rz("private Unterbrechungen (−)", "−"+fmtDauer(r.privat)+" h"):"")
    +rz("<strong>Brutto-Anwesenheit</strong>", "<strong>"+fmtDauer(r.brutto)+" h</strong>")
-   +rz("gebuchte Pause", fmtDauer(r.gebuchtePause)+" h","zwi")
-   +rz("Pflichtpause nach § 4 ArbZG", fmtDauer(r.pflichtPause)+" h","zwi")
+   +(r.pauseAutomatisch
+      ? rz("Mindestpause § 4 ArbZG — automatisch abgezogen, da keine Pause gestempelt", fmtDauer(r.pflichtPause)+" h","zwi")
+      : rz("gestempelte Pause", fmtDauer(r.gebuchtePause)+" h","zwi")
+        +rz("Mindestpause nach § 4 ArbZG", fmtDauer(r.pflichtPause)+" h","zwi"))
    +(r.zuschlag?rz("Verspätungszuschlag ("+esc(r.zuschlagInfo)+")", "+"+fmtDauer(r.zuschlag)+" h","zwi"):"")
    +rz("<strong>Pausenabzug gesamt (−)</strong>", "<strong>−"+fmtDauer(r.abzug)+" h</strong>")
    +(r.gekappt?rz("über "+fmtDauer(E().kappung)+" h gekappt (−)", "−"+fmtDauer(r.gekappt)+" h"):"")
@@ -1503,7 +1520,7 @@ function zeichneEinstellungen(){
    +'<input type="text" class="kurz" id="rahmenBis" value="'+esc(e.rahmenBis)+'" aria-label="Rahmenzeit bis"></div>'
    +'<div class="sub">Buchungen außerhalb sind erlaubt und werden nur als Hinweis markiert. Feiertage bleiben ausgenommen.</div></div>'
    +'<div class="feld"><label class="schalter"><input type="checkbox" id="kernAn"'+(e.kernzeitPruefung?" checked":"")+'>Kernarbeitszeit prüfen</label>'
-   +'<div class="sub">Wird eine Kernzeit nicht abgedeckt, erscheint nur ein Hinweis — es wird nichts automatisch korrigiert.</div></div>';
+   +'<div class="sub">Standardmäßig <strong>aus</strong> — es kommt keine Meldung, wenn du außerhalb der Kernzeit stempelst oder vor ihrem Ende gehst. Eingeschaltet erscheint lediglich ein Hinweis; korrigiert wird nie etwas.</div></div>';
   [1,2,3,4,5,6,0].forEach(function(i){
     var bl=(e.kernzeiten[String(i)]||[]);
     h+='<div class="kernblock"><div class="wt">'+WT_LANG[i]+'</div>';
