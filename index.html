@@ -280,8 +280,30 @@ input.kurz{max-width:150px}
   table.monat tr.z-gruen td{background:#e9f3ec}
   table.monat tr.z-rot td{background:#fbeeeb}
   table.monat input.t{border:none;background:none;width:34px;padding:0;color:#000;min-height:0;font-size:8pt}
+  /* Spaltentrenner: feine Linie zwischen allen Spalten, kraeftige an den Gruppengrenzen
+     (Datum+Tag | Art | Kommen+Gehen | Pause | Dienstgang | Berechnung | Notiz) */
+  table.monat th,table.monat td{border-right:1px solid #d4d4d4}
+  table.monat th:nth-child(2),table.monat td:nth-child(2),
+  table.monat th:nth-child(3),table.monat td:nth-child(3),
+  table.monat th:nth-child(5),table.monat td:nth-child(5),
+  table.monat th:nth-child(7),table.monat td:nth-child(7),
+  table.monat th:nth-child(9),table.monat td:nth-child(9),
+  table.monat th:nth-child(14),table.monat td:nth-child(14){border-right:1px solid #5f5f5f}
+  table.monat th:last-child,table.monat td:last-child{border-right:none}
+  /* Platzhalter und Fuellzeichen gehoeren nicht auf ein Nachweisblatt */
+  table.monat input.t::placeholder{color:transparent}
+  table.monat td:has(input.t[value=""]) .bis{visibility:hidden}
+  .notizbtn span{display:none}
+  /* Kopfzeile auf Folgeseiten wiederholen, Zeilen nicht ueber den Seitenrand brechen */
+  table.monat thead{display:table-header-group}
+  table.monat tr{break-inside:avoid}
+  /* Monatskennzahlen als eine saubere Reihe statt mit Umbruch */
+  .kacheln{grid-template-columns:repeat(9,1fr);margin-bottom:4mm}
+  .kacheln > div{padding:3px 5px}
+  .kacheln .k{font-size:6pt;min-height:20px;letter-spacing:.02em}
+  .kacheln .v{font-size:9.5pt;margin-top:0}
   .artbtn,.notizbtn{border:none;padding:0;color:#000;max-width:none}
-  .bar,.mark{display:none}
+  .bar,.mark,.stift{display:none}
   .calc{color:#000}
   .kacheln{border:1px solid #888;background:#888}
   .kacheln > div{background:#fff}
