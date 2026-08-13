@@ -1,0 +1,1817 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zeiterfassung</title>
+<meta name="theme-color" content="#1f4e79">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Zeiterfassung">
+<meta name="color-scheme" content="light dark">
+<style>
+:root{
+  --bg:#f4f6f8; --surface:#ffffff; --surface2:#fafbfc; --text:#15181c; --muted:#5b6672;
+  --line:#dfe4e9; --line-stark:#c3ccd4; --akzent:#1f4e79; --akzent-weich:#e8f0f7;
+  --plus:#1c6b4b; --minus:#9c3a2c; --warn:#8a5a00; --warn-bg:#fdf6e6;
+  --bar-plus:#2f7d5c; --bar-minus:#a8503f; --fokus:#1f4e79;
+  --schatten:0 1px 2px rgba(16,24,32,.06),0 1px 8px rgba(16,24,32,.05);
+}
+:root[data-theme="dunkel"]{
+  --bg:#111417; --surface:#1a1e22; --surface2:#20252a; --text:#e6eaee; --muted:#98a3ae;
+  --line:#2b3138; --line-stark:#3a424b; --akzent:#7fb3e0; --akzent-weich:#1c2a37;
+  --plus:#6cc79b; --minus:#e58f7d; --warn:#d9a83f; --warn-bg:#2a2413;
+  --bar-plus:#3d9a72; --bar-minus:#b8604c; --fokus:#7fb3e0;
+  --schatten:0 1px 2px rgba(0,0,0,.4);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="hell"]){
+    --bg:#111417; --surface:#1a1e22; --surface2:#20252a; --text:#e6eaee; --muted:#98a3ae;
+    --line:#2b3138; --line-stark:#3a424b; --akzent:#7fb3e0; --akzent-weich:#1c2a37;
+    --plus:#6cc79b; --minus:#e58f7d; --warn:#d9a83f; --warn-bg:#2a2413;
+    --bar-plus:#3d9a72; --bar-minus:#b8604c; --fokus:#7fb3e0;
+    --schatten:0 1px 2px rgba(0,0,0,.4);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:16px; line-height:1.45; -webkit-text-size-adjust:100%;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;
+}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--fokus);outline-offset:2px}
+
+.topbar{position:sticky;top:0;z-index:30;background:var(--surface);border-bottom:1px solid var(--line);padding:env(safe-area-inset-top) 0 0 0}
+.topbar-in{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:8px 14px;min-height:52px}
+.marke{font-weight:650;letter-spacing:.01em;font-size:15px;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.marke span{color:var(--muted);font-weight:400}
+.nav{margin-left:auto;display:flex;gap:6px;align-items:center;flex:0 0 auto}
+@media(max-width:560px){
+  .topbar-in{gap:8px;padding:8px 10px}
+  .marke{font-size:14px}
+  .marke span{display:none}
+  .nav{gap:4px}
+  .nav a{padding:0 10px;font-size:13.5px}
+  .iconbtn{min-width:36px;padding:0 7px}
+  main{padding:14px 10px 56px}
+}
+.nav a{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 14px;border-radius:8px;text-decoration:none;color:var(--muted);font-size:14px;font-weight:550;border:1px solid transparent}
+.nav a:hover{background:var(--surface2);color:var(--text)}
+.nav a.aktiv{background:var(--akzent-weich);color:var(--akzent);border-color:var(--line)}
+.iconbtn{min-width:38px;min-height:38px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0 9px;color:var(--muted)}
+.iconbtn:hover{background:var(--surface2);color:var(--text)}
+main{max-width:1400px;margin:0 auto;padding:16px 14px 64px}
+.eng{max-width:760px}
+h1{font-size:20px;margin:0 0 4px;font-weight:650;letter-spacing:-.01em}
+h2{font-size:14px;margin:26px 0 10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+h3{font-size:15px;margin:18px 0 8px;font-weight:650}
+p.hint{color:var(--muted);font-size:13px;margin:4px 0 0}
+code{background:var(--surface2);border:1px solid var(--line);border-radius:4px;padding:1px 4px;font-size:12.5px}
+
+.karte{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--schatten)}
+.pad{padding:16px}
+
+#banner{display:none;margin:0;padding:10px 14px;background:var(--warn-bg);color:var(--warn);border-bottom:1px solid var(--line);font-size:13.5px;font-weight:550}
+#banner.an{display:block}
+
+.status{padding:18px;display:flex;flex-direction:column;gap:2px;border-left:4px solid var(--line-stark);border-radius:12px}
+.status[data-z="arbeit"]{border-left-color:var(--plus)}
+.status[data-z="pause"]{border-left-color:var(--warn)}
+.status[data-z="dienstgang"]{border-left-color:var(--akzent)}
+.status .zeile1{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.status .zustand{font-size:23px;font-weight:650;letter-spacing:-.01em}
+.status .marker{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);color:var(--muted)}
+.status .seit{color:var(--muted);font-size:14px;margin-top:6px}
+.status .uhr{margin-left:auto;font-size:26px;font-weight:600;letter-spacing:-.01em}
+
+.tasten{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.taste{min-height:78px;border-radius:12px;border:1px solid var(--line-stark);background:var(--surface);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-weight:650;font-size:14.5px;letter-spacing:.03em;box-shadow:var(--schatten);transition:transform .08s ease,background .12s ease}
+.taste:active{transform:scale(.985)}
+.taste svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.taste[disabled]{opacity:.36;cursor:not-allowed;box-shadow:none}
+.taste.kommen:not([disabled]){border-color:var(--plus);color:var(--plus)}
+.taste.gehen:not([disabled]){border-color:var(--minus);color:var(--minus)}
+.taste.pause:not([disabled]){border-color:var(--warn);color:var(--warn)}
+.taste.dienstgang:not([disabled]){border-color:var(--akzent);color:var(--akzent)}
+.taste.blitz{animation:blitz .5s ease}
+@keyframes blitz{0%{background:var(--akzent-weich)}100%{background:var(--surface)}}
+
+#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--surface);border:1px solid var(--line-stark);border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.18);padding:10px 12px;display:none;align-items:center;gap:12px;z-index:60;max-width:calc(100vw - 28px);font-size:14px}
+#toast.an{display:flex}
+#toast button{border:1px solid var(--line-stark);background:var(--surface2);border-radius:8px;padding:7px 11px;cursor:pointer;font-weight:600;font-size:13px;white-space:nowrap}
+
+.konto{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.konto .gross{font-size:40px;font-weight:680;letter-spacing:-.02em;line-height:1.05}
+.konto .gross.p{color:var(--plus)} .konto .gross.m{color:var(--minus)}
+.konto .neben{color:var(--muted);font-size:14px;padding-bottom:6px}
+.label{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+
+.heute{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:1px;background:var(--line);border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.heute > div{background:var(--surface);padding:12px 14px}
+.heute .k{font-size:11.5px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;font-weight:650;min-height:32px}
+.heute .v{font-size:19px;font-weight:640;margin-top:3px}
+
+.aktionen{display:flex;gap:10px;margin-top:14px}
+.aktionen a.gross-link{flex:1;min-height:56px;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;border-radius:12px;border:1px solid var(--line-stark);background:var(--surface);color:var(--text);font-weight:650;letter-spacing:.03em;box-shadow:var(--schatten)}
+
+.hinweise{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.hinweise li{display:flex;gap:9px;align-items:flex-start;font-size:13.5px;padding:8px 10px;border-radius:8px;background:var(--surface2);border:1px solid var(--line)}
+.hinweise li .sym{font-weight:800;font-size:12px;line-height:1.5;flex:0 0 auto;width:16px;text-align:center}
+.hinweise li.w{background:var(--warn-bg);border-color:var(--warn)}
+.hinweise li.w .sym{color:var(--warn)}
+.hinweise li.i .sym{color:var(--muted)}
+.hinweise li button{margin-left:auto;background:none;border:none;color:var(--akzent);cursor:pointer;font-size:13px;font-weight:600;text-decoration:underline;padding:0;white-space:nowrap}
+
+.monatsleiste{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.monatsleiste .titel{font-size:19px;font-weight:650;min-width:180px}
+.btn{border:1px solid var(--line-stark);background:var(--surface);border-radius:8px;min-height:38px;padding:0 12px;cursor:pointer;font-size:14px;font-weight:550}
+.btn:hover{background:var(--surface2)}
+.btn.prim{background:var(--akzent);color:#fff;border-color:var(--akzent)}
+.btn.gefahr{color:var(--minus);border-color:var(--minus)}
+.reiter{display:flex;gap:4px;margin-bottom:14px;border-bottom:1px solid var(--line)}
+.reiter button{background:none;border:none;border-bottom:2px solid transparent;padding:9px 14px;cursor:pointer;font-weight:600;color:var(--muted);font-size:14.5px}
+.reiter button.aktiv{color:var(--text);border-bottom-color:var(--akzent)}
+
+.kacheln{display:grid;grid-template-columns:repeat(auto-fit,minmax(124px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:14px}
+.kacheln > div{background:var(--surface);padding:11px 13px}
+.kacheln .k{font-size:11px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;font-weight:700;min-height:30px}
+.kacheln .v{font-size:19px;font-weight:640;margin-top:2px}
+.p{color:var(--plus)} .m{color:var(--minus)}
+
+.tabwrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface);-webkit-overflow-scrolling:touch}
+table.monat{border-collapse:separate;border-spacing:0;width:100%;font-size:13px;min-width:1120px}
+table.monat th{position:sticky;top:0;z-index:2;background:var(--surface2);text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:9px 5px;border-bottom:1px solid var(--line-stark);white-space:nowrap}
+table.monat td{padding:3px 5px;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle;height:42px}
+table.monat tr:last-child td{border-bottom:none}
+table.monat tr.frei td{background:var(--surface2);color:var(--muted)}
+table.monat tr.heute td{background:var(--akzent-weich)}
+table.monat tr.blink td{animation:blink 1.6s ease}
+@keyframes blink{0%,40%{background:var(--akzent-weich)}100%{background:transparent}}
+table.monat td.r{text-align:right}
+.calc{color:var(--muted)}
+.calc.stark{color:var(--text);font-weight:600}
+table.monat input.t{width:56px;min-height:32px;padding:3px 3px;border:1px solid transparent;border-radius:6px;background:transparent;text-align:center;font-variant-numeric:tabular-nums}
+table.monat input.t:hover{border-color:var(--line)}
+table.monat input.t:focus{border-color:var(--fokus);background:var(--surface);outline:none}
+table.monat input.t::placeholder{color:var(--line-stark)}
+.artbtn{background:none;border:1px solid transparent;border-radius:6px;padding:4px 7px;cursor:pointer;font-size:12.5px;font-weight:600;color:inherit;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
+.artbtn:hover{border-color:var(--line);background:var(--surface2)}
+.notizbtn{background:none;border:1px solid transparent;border-radius:6px;padding:4px 7px;cursor:pointer;color:var(--muted);font-size:12.5px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;text-align:left;min-width:44px}
+.notizbtn:hover{border-color:var(--line);background:var(--surface2)}
+.mark{font-size:10px;font-weight:700;color:var(--warn);margin-left:3px;vertical-align:super;cursor:help}
+.stift{color:var(--muted);font-size:11px;margin-left:3px}
+.bar{display:block;position:relative;width:62px;height:8px;margin-top:3px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.bar::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line-stark)}
+.bfill{position:absolute;top:0;bottom:0;border-radius:4px}
+.bfill.p{background:var(--bar-plus)} .bfill.m{background:var(--bar-minus)}
+
+#backdrop{position:fixed;inset:0;background:rgba(10,14,18,.44);z-index:40;display:none}
+#backdrop.an{display:block}
+#detail{position:fixed;z-index:50;right:0;top:0;bottom:0;width:min(580px,100%);background:var(--surface);border-left:1px solid var(--line);overflow-y:auto;display:none;box-shadow:-8px 0 30px rgba(0,0,0,.15);padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+#detail.an{display:block}
+@media(max-width:640px){#detail{top:auto;height:92vh;width:100%;border-left:none;border-top:1px solid var(--line);border-radius:14px 14px 0 0}}
+.dkopf{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);padding:14px 16px;display:flex;align-items:center;gap:10px;z-index:2}
+.dkopf .dt{font-weight:650;font-size:17px}
+.dkopf .ds{color:var(--muted);font-size:13px}
+.dbody{padding:14px 16px}
+.ivliste{display:flex;flex-direction:column;gap:6px;margin:6px 0 0}
+.ivzeile{display:flex;align-items:center;gap:8px}
+.ivzeile input.t{width:84px;min-height:44px;text-align:center;border:1px solid var(--line-stark);border-radius:8px;background:var(--surface2);padding:4px 6px}
+.ivzeile input.g{flex:1;min-height:44px;border:1px solid var(--line-stark);border-radius:8px;background:var(--surface2);padding:4px 10px;min-width:60px}
+.ivzeile input.z{width:92px;min-height:44px;text-align:right;border:1px solid var(--line-stark);border-radius:8px;background:var(--surface2);padding:4px 8px}
+.ivzeile .bis{color:var(--muted);font-size:14px}
+.del{border:1px solid var(--line);background:var(--surface);border-radius:8px;min-width:44px;min-height:44px;cursor:pointer;color:var(--muted);font-size:16px;line-height:1}
+.del:hover{color:var(--minus);border-color:var(--minus)}
+.addbtn{margin-top:8px;border:1px dashed var(--line-stark);background:none;border-radius:8px;min-height:44px;padding:0 12px;cursor:pointer;color:var(--muted);font-size:13.5px;font-weight:600;width:100%}
+.addbtn:hover{color:var(--text);border-color:var(--text)}
+.rechnung{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:6px}
+.rechnung td{padding:6px 2px;border-bottom:1px solid var(--line)}
+.rechnung td:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rechnung tr.sum td{font-weight:700;border-bottom:none;border-top:1px solid var(--line-stark);padding-top:8px}
+.rechnung tr.zwi td{color:var(--muted)}
+
+.feld{margin-bottom:14px}
+.feld > label{display:block;font-size:13px;font-weight:650;margin-bottom:5px}
+.feld .sub{font-size:12.5px;color:var(--muted);margin-top:4px}
+input[type=text],input[type=date],input[type=number],select,textarea{width:100%;min-height:46px;padding:8px 11px;border:1px solid var(--line-stark);border-radius:9px;background:var(--surface2)}
+textarea{min-height:84px;resize:vertical;line-height:1.45}
+input.kurz{max-width:150px}
+.reihe{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-stark);border-radius:999px;padding:8px 14px;cursor:pointer;font-size:14px;background:var(--surface2);user-select:none;min-height:44px}
+.chip input{margin:0;width:auto;min-height:0;accent-color:var(--akzent)}
+.chip.an{background:var(--akzent-weich);border-color:var(--akzent);color:var(--akzent);font-weight:600}
+.schalter{display:flex;align-items:center;gap:10px;cursor:pointer;min-height:44px;font-size:14px;font-weight:600}
+.schalter input{width:auto;min-height:0;accent-color:var(--akzent);transform:scale(1.25);margin:0 2px 0 0}
+.kernblock{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;background:var(--surface2)}
+.kernblock .wt{font-weight:650;font-size:13.5px;margin-bottom:6px}
+.trenner{height:1px;background:var(--line);margin:22px 0}
+.knopfreihe{display:flex;gap:10px;flex-wrap:wrap}
+.jahrtab{width:100%;border-collapse:collapse;font-size:14px}
+.jahrtab th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:8px;border-bottom:1px solid var(--line-stark)}
+.jahrtab th.r,.jahrtab td.r{text-align:right}
+.jahrtab td{padding:9px 8px;border-bottom:1px solid var(--line)}
+.jahrtab tr.jetzt td{font-weight:650}
+.legende{color:var(--muted);font-size:12.5px;margin-top:10px}
+
+#druckkopf{display:none}
+.unterschrift{display:none}
+
+@media print{
+  @page{size:A4 landscape;margin:11mm}
+  body{background:#fff;color:#000;font-size:10pt}
+  .topbar,#banner,.reiter,.monatsleiste,#toast,#backdrop,#detail,.noprint,.aktionen,.legende,#warnBox{display:none!important}
+  main{max-width:none;padding:0}
+  #druckkopf{display:block;margin-bottom:6mm}
+  #druckkopf .dtitel{font-size:15pt;font-weight:700}
+  #druckkopf .dzeile{font-size:9.5pt;margin-top:1.5mm}
+  .karte{border:none;box-shadow:none;background:#fff}
+  .tabwrap{overflow:visible;border:1px solid #888;border-radius:0}
+  table.monat{min-width:0;font-size:8pt}
+  table.monat th{background:#eee;color:#000;position:static;border-bottom:1px solid #666;padding:2px 3px;font-size:7pt}
+  table.monat td{padding:1px 3px;height:auto;border-bottom:1px solid #ddd}
+  table.monat tr.frei td{background:#f5f5f5;color:#444}
+  table.monat tr.heute td{background:#fff}
+  table.monat input.t{border:none;background:none;width:34px;padding:0;color:#000;min-height:0;font-size:8pt}
+  .artbtn,.notizbtn{border:none;padding:0;color:#000;max-width:none}
+  .bar,.mark{display:none}
+  .calc{color:#000}
+  .kacheln{border:1px solid #888;background:#888}
+  .kacheln > div{background:#fff}
+  .p,.m{color:#000}
+  .unterschrift{display:flex!important;gap:24mm;margin-top:14mm;font-size:9pt}
+  .unterschrift span{border-top:1px solid #000;padding-top:2mm;min-width:65mm}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar noprint">
+  <div class="topbar-in">
+    <div class="marke">Zeiterfassung <span>· privat</span></div>
+    <nav class="nav">
+      <a href="#/stempel" data-nav="stempel">Stempeluhr</a>
+      <a href="#/info" data-nav="info">Info</a>
+      <button class="iconbtn" id="themeBtn" title="Hell / Dunkel umschalten" aria-label="Hell / Dunkel umschalten">◐</button>
+      <a href="#/einstellungen" class="iconbtn" data-nav="einstellungen" title="Einstellungen" aria-label="Einstellungen">⚙</a>
+    </nav>
+  </div>
+</header>
+<div id="banner" role="status"></div>
+<main id="view"></main>
+
+<div id="backdrop"></div>
+<aside id="detail" aria-label="Tagesdetail"></aside>
+<div id="toast" role="status"></div>
+
+<script id="engine">
+/* =========================================================================
+   RECHENKERN — bewusst ohne DOM-Zugriff, damit er separat prüfbar ist.
+   ========================================================================= */
+"use strict";
+
+var WT_KURZ = ["So","Mo","Di","Mi","Do","Fr","Sa"];
+var WT_LANG = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
+var MONATE  = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+
+function pad2(n){ return String(n).length<2 ? "0"+n : String(n); }
+
+/* ---- Datum ---- */
+function keyOf(d){ return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate()); }
+function dateOf(key){ var t=String(key).split("-"); return new Date(+t[0],+t[1]-1,+t[2]); }
+function fmtDatum(key){ var t=String(key).split("-"); return t[2]+"."+t[1]+"."+t[0]; }
+function fmtDatumKurz(key){ var t=String(key).split("-"); return t[2]+"."+t[1]+"."; }
+function tageImMonat(j,m){ return new Date(j,m+1,0).getDate(); }
+function isoWoche(d){
+  var t=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  t.setDate(t.getDate()+3-((t.getDay()+6)%7));
+  var w1=new Date(t.getFullYear(),0,4);
+  return 1+Math.round(((t-w1)/86400000-3+((w1.getDay()+6)%7))/7);
+}
+function isoWocheKey(d){
+  var t=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  t.setDate(t.getDate()+3-((t.getDay()+6)%7));
+  return t.getFullYear()+"-KW"+pad2(isoWoche(d));
+}
+
+/* ---- Zeit ---- */
+function parseZeit(str){
+  if(str===null||str===undefined) return null;
+  var s=String(str).trim().toLowerCase().replace(/uhr/g,"").replace(/\s+/g,"").replace(/[.,;]/g,":");
+  if(!s) return null;
+  var h,m;
+  if(s.indexOf(":")>=0){
+    var p=s.split(":");
+    if(p[0]==="") return null;
+    h=parseInt(p[0],10); m=(p[1]===""||p[1]===undefined)?0:parseInt(p[1],10);
+  } else if(/^\d{1,2}$/.test(s)){ h=parseInt(s,10); m=0; }
+  else if(/^\d{3}$/.test(s)){ h=parseInt(s.slice(0,1),10); m=parseInt(s.slice(1),10); }
+  else if(/^\d{4}$/.test(s)){ h=parseInt(s.slice(0,2),10); m=parseInt(s.slice(2),10); }
+  else return null;
+  if(!isFinite(h)||!isFinite(m)) return null;
+  if(h===24&&m===0) return 1440;
+  if(h<0||h>23||m<0||m>59) return null;
+  return h*60+m;
+}
+function fmtUhr(min){
+  if(min===null||min===undefined||!isFinite(min)) return "";
+  var v=Math.round(min); if(v<0) v=0;
+  return pad2(Math.floor(v/60))+":"+pad2(v%60);
+}
+function fmtDauer(min){
+  var a=Math.abs(Math.round(min||0));
+  return Math.floor(a/60)+":"+pad2(a%60);
+}
+function fmtSaldo(min){
+  var v=Math.round(min||0);
+  return (v>0?"+":v<0?"−":"±")+fmtDauer(v);
+}
+function parseDauer(str){
+  if(str===null||str===undefined) return null;
+  var s=String(str).trim().toLowerCase().replace(/h/g,"").replace(/\s+/g,"").replace(/[.,]/g,":");
+  if(!s) return null;
+  var neg=false;
+  if(s.charAt(0)==="-"||s.charAt(0)==="−"||s.charAt(0)==="+"){ neg=(s.charAt(0)!=="+"); s=s.slice(1); }
+  var h,m;
+  if(s.indexOf(":")>=0){ var p=s.split(":"); h=parseInt(p[0]||"0",10); m=parseInt(p[1]||"0",10); }
+  else if(/^\d+$/.test(s)){ h=parseInt(s,10); m=0; }
+  else return null;
+  if(!isFinite(h)||!isFinite(m)||m<0||m>59||h<0) return null;
+  var v=h*60+m;
+  return neg?-v:v;
+}
+
+/* ---- Feiertage: Gauß'sche Osterformel ---- */
+function ostersonntag(jahr){
+  var a=jahr%19, b=Math.floor(jahr/100), c=jahr%100,
+      d=Math.floor(b/4), e=b%4, f=Math.floor((b+8)/25), g=Math.floor((b-f+1)/3),
+      h=(19*a+b-d-g+15)%30, i=Math.floor(c/4), k=c%4,
+      l=(32+2*e+2*i-h-k)%7, m=Math.floor((a+11*h+22*l)/451),
+      mon=Math.floor((h+l-7*m+114)/31), tag=((h+l-7*m+114)%31)+1;
+  return new Date(jahr,mon-1,tag);
+}
+var LAENDER = {
+  BW:"Baden-Württemberg", BY:"Bayern", BE:"Berlin", BB:"Brandenburg", HB:"Bremen",
+  HH:"Hamburg", HE:"Hessen", MV:"Mecklenburg-Vorpommern", NI:"Niedersachsen",
+  NW:"Nordrhein-Westfalen", RP:"Rheinland-Pfalz", SL:"Saarland", SN:"Sachsen",
+  ST:"Sachsen-Anhalt", SH:"Schleswig-Holstein", TH:"Thüringen"
+};
+var _ftCache={};
+function feiertage(jahr,land){
+  var ck=jahr+"|"+land;
+  if(_ftCache[ck]) return _ftCache[ck];
+  var r={};
+  function fix(m,t,name){ r[jahr+"-"+pad2(m)+"-"+pad2(t)]=name; }
+  function rel(off,name){ var o=ostersonntag(jahr); var d=new Date(o.getFullYear(),o.getMonth(),o.getDate()+off); r[keyOf(d)]=name; }
+  fix(1,1,"Neujahr");
+  fix(5,1,"Tag der Arbeit");
+  fix(10,3,"Tag der Deutschen Einheit");
+  fix(12,25,"1. Weihnachtstag");
+  fix(12,26,"2. Weihnachtstag");
+  rel(-2,"Karfreitag"); rel(1,"Ostermontag"); rel(39,"Christi Himmelfahrt"); rel(50,"Pfingstmontag");
+  if(["BW","BY","ST"].indexOf(land)>=0) fix(1,6,"Heilige Drei Könige");
+  if(["BE","MV"].indexOf(land)>=0) fix(3,8,"Internationaler Frauentag");
+  if(land==="BB"){ rel(0,"Ostersonntag"); rel(49,"Pfingstsonntag"); }
+  if(["BW","BY","HE","NW","RP","SL"].indexOf(land)>=0) rel(60,"Fronleichnam");
+  if(["BY","SL"].indexOf(land)>=0) fix(8,15,"Mariä Himmelfahrt");
+  if(land==="TH") fix(9,20,"Weltkindertag");
+  if(["BB","HB","HH","MV","NI","SH","SN","ST","TH"].indexOf(land)>=0) fix(10,31,"Reformationstag");
+  if(["BW","BY","NW","RP","SL"].indexOf(land)>=0) fix(11,1,"Allerheiligen");
+  if(land==="SN"){
+    var d=new Date(jahr,10,23);
+    while(d.getDay()!==3) d.setDate(d.getDate()-1);
+    r[keyOf(d)]="Buß- und Bettag";
+  }
+  _ftCache[ck]=r;
+  return r;
+}
+function feiertagName(key,land){
+  var j=parseInt(String(key).slice(0,4),10);
+  return feiertage(j,land)[key]||null;
+}
+
+/* ---- Tagesarten ---- */
+var ARTEN = {
+  arbeit:        {name:"Arbeitstag",      sollFaktor:1,   gutschrift:0,   additiv:true },
+  urlaub:        {name:"Urlaub",          sollFaktor:1,   gutschrift:1,   additiv:true },
+  urlaub_halb:   {name:"Urlaub ½ Tag",    sollFaktor:1,   gutschrift:0.5, additiv:true },
+  krank:         {name:"Krank",           sollFaktor:1,   gutschrift:1,   additiv:true },
+  feiertag:      {name:"Feiertag",        sollFaktor:0,   gutschrift:0,   additiv:true },
+  sonderurlaub:  {name:"Sonderurlaub / Dienstbefreiung", sollFaktor:1, gutschrift:1, additiv:true },
+  fortbildung:   {name:"Fortbildung / Lehrgang", sollFaktor:1, gutschrift:1, additiv:false },
+  gleittag:      {name:"Gleittag (Zeitausgleich)", sollFaktor:1, gutschrift:0, additiv:true },
+  gleittag_halb: {name:"Gleittag ½ Tag",  sollFaktor:1,   gutschrift:0.5, additiv:true },
+  wochenende:    {name:"Wochenende / frei", sollFaktor:0, gutschrift:0,   additiv:true }
+};
+var ART_REIHE = ["arbeit","urlaub","urlaub_halb","krank","feiertag","sonderurlaub","fortbildung","gleittag","gleittag_halb","wochenende"];
+
+/* ---- Standard-Einstellungen ---- */
+function standardEinstellungen(){
+  return {
+    wochenarbeitszeit: 2400,
+    arbeitstage: [false,true,true,true,true,true,false],   /* 0=So … 6=Sa */
+    tagessollAuto: true,
+    tagessoll: 480,
+    rahmenVon: "06:00",
+    rahmenBis: "19:00",
+    rahmenPruefung: true,
+    kernzeitPruefung: true,
+    kernzeiten: {
+      "0":[], "6":[],
+      "1":[{von:"08:30",bis:"12:00"},{von:"14:00",bis:"16:00"}],
+      "2":[{von:"08:30",bis:"12:00"},{von:"14:00",bis:"16:00"}],
+      "3":[{von:"08:30",bis:"12:00"},{von:"14:00",bis:"16:00"}],
+      "4":[{von:"08:30",bis:"12:00"},{von:"14:00",bis:"18:00"}],
+      "5":[{von:"08:30",bis:"12:00"}]
+    },
+    pausenstufen: [{grenze:360,pause:30},{grenze:540,pause:45}],
+    verspaetungszuschlag: true,
+    kappung: 600,
+    maxWoche: 3600,
+    ruhezeit: 660,
+    kontoMinus: 720,
+    kontoPlus: 6000,
+    startKonto: 0,
+    stichtag: "",
+    land: "RP",
+    name: "",
+    theme: "auto"
+  };
+}
+function tagessollBerechnet(e){
+  if(!e.tagessollAuto) return Math.round(e.tagessoll||0);
+  var n=0; for(var i=0;i<7;i++) if(e.arbeitstage[i]) n++;
+  if(!n) return 0;
+  return Math.round(e.wochenarbeitszeit/n);
+}
+
+/* ---- Intervall-Helfer ---- */
+function verschmelze(rng){
+  var s=rng.slice().sort(function(a,b){return a[0]-b[0];}), out=[];
+  for(var i=0;i<s.length;i++){
+    if(out.length && s[i][0]<=out[out.length-1][1]) out[out.length-1][1]=Math.max(out[out.length-1][1],s[i][1]);
+    else out.push([s[i][0],s[i][1]]);
+  }
+  return out;
+}
+function ueberlappung(a,b,rng){
+  var sum=0;
+  for(var i=0;i<rng.length;i++){
+    var lo=Math.max(a,rng[i][0]), hi=Math.min(b,rng[i][1]);
+    if(hi>lo) sum+=hi-lo;
+  }
+  return sum;
+}
+function deckungsluecke(a,b,rng){ return Math.max(0,(b-a)-ueberlappung(a,b,rng)); }
+function abziehen(rng,weg){
+  var out=[];
+  for(var i=0;i<rng.length;i++){
+    var teile=[[rng[i][0],rng[i][1]]];
+    for(var j=0;j<weg.length;j++){
+      var neu=[];
+      for(var k=0;k<teile.length;k++){
+        var t=teile[k], w=weg[j];
+        if(w[1]<=t[0]||w[0]>=t[1]){ neu.push(t); continue; }
+        if(w[0]>t[0]) neu.push([t[0],w[0]]);
+        if(w[1]<t[1]) neu.push([w[1],t[1]]);
+      }
+      teile=neu;
+    }
+    out=out.concat(teile);
+  }
+  return out;
+}
+function typName(t){
+  return t==="arbeit"?"Arbeitszeit":t==="pause"?"Pause":t==="dienstgang"?"Dienstgang":t==="privat"?"private Unterbrechung":String(t);
+}
+
+/* =========================================================================
+   berechneTag — exakt nach Abschnitt 3 des Regelwerks
+   ========================================================================= */
+function berechneTag(key, tag, e, opt){
+  opt = opt || {};
+  tag = tag || {};
+  var jetztMin = (opt.jetztMin===undefined||opt.jetztMin===null) ? null : opt.jetztMin;
+  var dow = dateOf(key).getDay();
+  var tagessoll = tagessollBerechnet(e);
+  var ftName = feiertagName(key, e.land);
+  var istArbeitstag = !!e.arbeitstage[dow];
+  var autoArt = ftName ? "feiertag" : (istArbeitstag ? "arbeit" : "wochenende");
+  var art = tag.art || autoArt;
+  if(!ARTEN[art]) art = autoArt;
+  var manuell = !!tag.art && tag.art !== autoArt;
+
+  var warn = [];
+  function w(t,txt){ warn.push({typ:t,text:txt}); }
+
+  /* --- 1. Intervalle auflösen --- */
+  var roh = tag.intervalle || [];
+  var iv = [], offen=false;
+  for(var i=0;i<roh.length;i++){
+    var x=roh[i];
+    var a=parseZeit(x.von), b=(x.bis===null||x.bis===undefined||x.bis==="")?null:parseZeit(x.bis);
+    if(a===null && b===null) continue;
+    if(a===null){ w("warn","Beginn fehlt bei "+typName(x.typ)+" (bis "+fmtUhr(b)+")."); continue; }
+    if(b===null){
+      offen = true;
+      if(jetztMin!==null){ b=Math.max(a,jetztMin); }
+      else { w("warn","Offene "+typName(x.typ)+"-Buchung — das Ende fehlt."); b=a; }
+    } else if(b<a){
+      w("warn","Ende vor Beginn bei "+typName(x.typ)+" ("+fmtUhr(a)+"–"+fmtUhr(b)+") — nicht gewertet.");
+      b=a;
+    }
+    iv.push({typ:x.typ,a:a,b:b,idx:i});
+  }
+  function vonTyp(t){ return iv.filter(function(x){return x.typ===t;}); }
+  function summe(l){ var s=0; for(var q=0;q<l.length;q++) s+=l[q].b-l[q].a; return s; }
+  var arbIv=vonTyp("arbeit"), pauIv=vonTyp("pause"), dgIv=vonTyp("dienstgang"), privIv=vonTyp("privat");
+  pauIv.sort(function(a,b){return a.a-b.a;});
+
+  /* --- 2. Brutto-Anwesenheit --- */
+  var arbRng = verschmelze(arbIv.map(function(x){return [x.a,x.b];}));
+  var dgAussen = 0;
+  for(var d1=0; d1<dgIv.length; d1++){
+    dgAussen += (dgIv[d1].b - dgIv[d1].a) - ueberlappung(dgIv[d1].a, dgIv[d1].b, arbRng);
+  }
+  var korrList = tag.korrekturen || [], korrSum = 0;
+  for(var kk=0; kk<korrList.length; kk++) korrSum += Math.round(korrList[kk].min||0);
+  var arbSum = summe(arbIv);
+  var brutto = arbSum + dgAussen + korrSum;
+
+  /* --- 3. Private Unterbrechungen abziehen --- */
+  var privSum = summe(privIv);
+  brutto -= privSum;
+  if(brutto<0) brutto=0;
+
+  /* --- 4. Pausenabzug --- */
+  var gebucht = summe(pauIv);
+  var stufen = (e.pausenstufen||[]).slice().sort(function(a,b){return a.grenze-b.grenze;});
+  var pflicht = 0;
+  for(var s1=0; s1<stufen.length; s1++) if(brutto > stufen[s1].grenze) pflicht = stufen[s1].pause;
+  var abzug = Math.max(gebucht, pflicht);
+
+  var zuschlag = 0, zuschlagInfo = "";
+  if(e.verspaetungszuschlag && arbIv.length && pauIv.length && pflicht>0){
+    var beginn = Math.min.apply(null, arbIv.map(function(x){return x.a;}));
+    for(var s2=0; s2<stufen.length; s2++){
+      var st = stufen[s2];
+      if(brutto <= st.grenze) continue;
+      var grenzZeit = beginn + st.grenze;
+      var antritt = null;
+      if(s2===0){ antritt = pauIv[0].a; }
+      else {
+        var kum=0;
+        for(var pi=0; pi<pauIv.length; pi++){
+          kum += pauIv[pi].b - pauIv[pi].a;
+          if(kum >= st.pause){ antritt = pauIv[pi].a; break; }
+        }
+      }
+      if(antritt!==null && antritt > grenzZeit){
+        var z = antritt - grenzZeit;
+        if(z > zuschlag){ zuschlag = z; zuschlagInfo = "Pausenantritt "+fmtUhr(antritt)+", "+fmtDauer(st.grenze)+"-Grenze um "+fmtUhr(grenzZeit); }
+      }
+    }
+  }
+  abzug += zuschlag;
+
+  /* --- 5. Netto und Kappung --- */
+  var netto = brutto - abzug;
+  if(netto<0) netto=0;
+  var gekappt = Math.max(0, netto - e.kappung);
+  netto = Math.min(netto, e.kappung);
+
+  /* --- 6. Soll / Ist / Saldo --- */
+  var def = ARTEN[art];
+  var soll = 0;
+  if(def.sollFaktor>0) soll = (art==="arbeit" && !istArbeitstag) ? 0 : Math.round(tagessoll*def.sollFaktor);
+  var gutschrift = Math.round(tagessoll*def.gutschrift);
+  var ist = def.additiv ? (gutschrift + netto) : Math.max(gutschrift, netto);
+  var saldo = ist - soll;
+
+  /* Tage vor dem Stichtag zählen weder ins Konto noch in die Monatssumme (Abschnitt 2.6) */
+  var vorStichtag = !!opt.vorStichtag;
+  if(vorStichtag){ soll = 0; saldo = 0; }
+
+  /* --- Warnungen und Hinweise --- */
+  if(gekappt>0) w("warn","Arbeitszeit auf "+fmtDauer(e.kappung)+" h gekappt — "+fmtDauer(gekappt)+" h fallen weg.");
+  if(brutto>0 && gebucht < pflicht)
+    w("warn","Gebuchte Pause ("+fmtDauer(gebucht)+" h) unter dem gesetzlichen Minimum von "+fmtDauer(pflicht)+" h (§ 4 ArbZG).");
+  if(zuschlag>0) w("warn","Verspätungszuschlag "+fmtDauer(zuschlag)+" h — "+zuschlagInfo+".");
+  if(offen && jetztMin!==null) w("hinweis","Eine Buchung läuft noch.");
+
+  if(e.rahmenPruefung && istArbeitstag && !ftName){
+    var rv=parseZeit(e.rahmenVon), rb=parseZeit(e.rahmenBis);
+    if(rv!==null && rb!==null){
+      var draussen=[];
+      arbIv.concat(dgIv).forEach(function(x){ if(x.a<rv || x.b>rb) draussen.push(fmtUhr(x.a)+"–"+fmtUhr(x.b)); });
+      if(draussen.length) w("hinweis","Buchung außerhalb der Rahmenzeit ("+fmtUhr(rv)+"–"+fmtUhr(rb)+"): "+draussen.join(", ")+".");
+    }
+  }
+  if(e.kernzeitPruefung && art==="arbeit" && istArbeitstag && !ftName){
+    var bloecke=(e.kernzeiten&&e.kernzeiten[String(dow)])||[];
+    if(bloecke.length){
+      var anwesend = abziehen(
+        verschmelze(arbIv.concat(dgIv).map(function(x){return [x.a,x.b];})),
+        verschmelze(privIv.map(function(x){return [x.a,x.b];}))
+      );
+      var fehlt=[];
+      for(var b1=0;b1<bloecke.length;b1++){
+        var kv=parseZeit(bloecke[b1].von), kb=parseZeit(bloecke[b1].bis);
+        if(kv===null||kb===null||kb<=kv) continue;
+        if(deckungsluecke(kv,kb,anwesend)>0) fehlt.push(fmtUhr(kv)+"–"+fmtUhr(kb));
+      }
+      if(fehlt.length && (arbIv.length||dgIv.length||korrSum))
+        w("hinweis","Kernarbeitszeit nicht abgedeckt: "+fehlt.join(", ")+".");
+    }
+  }
+  if(opt.vortagEnde!==null && opt.vortagEnde!==undefined && arbIv.length){
+    var ersterBeginn=Math.min.apply(null,arbIv.map(function(x){return x.a;}));
+    var ruhe = (1440 - opt.vortagEnde) + ersterBeginn;
+    if(ruhe < e.ruhezeit)
+      w("warn","Ruhezeit zum Vortag nur "+fmtDauer(ruhe)+" h (verlangt: "+fmtDauer(e.ruhezeit)+" h).");
+  }
+
+  var kommen = arbIv.length ? Math.min.apply(null,arbIv.map(function(x){return x.a;})) : null;
+  var gehen = null;
+  if(arbIv.length){
+    var alleZu = true;
+    for(var g=0; g<roh.length; g++)
+      if(roh[g].typ==="arbeit" && (roh[g].bis===null||roh[g].bis===undefined||roh[g].bis==="")) alleZu=false;
+    if(alleZu) gehen = Math.max.apply(null,arbIv.map(function(x){return x.b;}));
+  }
+
+  return {
+    key:key, dow:dow, art:art, autoArt:autoArt, artManuell:manuell, artName:def.name,
+    feiertag:ftName, istArbeitstag:istArbeitstag, tagessoll:tagessoll,
+    kommen:kommen, gehen:gehen, offen:offen,
+    arbeitSumme:arbSum, dienstgangAussen:dgAussen, dienstgangSumme:summe(dgIv),
+    korrektur:korrSum, korrekturen:korrList, privat:privSum,
+    brutto:brutto, gebuchtePause:gebucht, pflichtPause:pflicht, zuschlag:zuschlag, zuschlagInfo:zuschlagInfo,
+    abzug:abzug, gekappt:gekappt, netto:netto, gutschrift:gutschrift,
+    soll:soll, ist:ist, saldo:saldo, vorStichtag:vorStichtag,
+    pausen:pauIv, dienstgaenge:dgIv, privatIv:privIv, arbeitIv:arbIv,
+    warnungen:warn,
+    hatDaten:(roh.length>0 || korrList.length>0 || !!tag.art || !!tag.notiz)
+  };
+}
+
+/* letztes Anwesenheitsende eines Tages — für die Ruhezeitprüfung */
+function letztesEnde(tag){
+  if(!tag||!tag.intervalle) return null;
+  var max=null;
+  tag.intervalle.forEach(function(x){
+    if(x.typ!=="arbeit"&&x.typ!=="dienstgang") return;
+    var b=parseZeit(x.bis); if(b===null) return;
+    if(max===null||b>max) max=b;
+  });
+  return max;
+}
+
+if(typeof module!=="undefined" && module.exports){
+  module.exports={parseZeit:parseZeit,parseDauer:parseDauer,fmtUhr:fmtUhr,fmtDauer:fmtDauer,fmtSaldo:fmtSaldo,
+    berechneTag:berechneTag,standardEinstellungen:standardEinstellungen,tagessollBerechnet:tagessollBerechnet,
+    feiertage:feiertage,feiertagName:feiertagName,ostersonntag:ostersonntag,ARTEN:ARTEN,keyOf:keyOf,
+    dateOf:dateOf,letztesEnde:letztesEnde,isoWocheKey:isoWocheKey,LAENDER:LAENDER};
+}
+</script>
+
+<script id="app">
+"use strict";
+(function(){
+
+/* =========================================================================
+   Zustand und Speicherung
+   ========================================================================= */
+var KEY="zeiterfassung.v1";
+var speicherOk=true;
+var state=null, seq=0;
+
+function leererState(){ return {version:1, einstellungen:standardEinstellungen(), tage:{}}; }
+
+function zeigeBanner(txt){
+  var b=document.getElementById("banner");
+  b.textContent="Achtung: "+txt;
+  b.className="an";
+}
+function laden(){
+  var roh=null;
+  try{
+    roh=window.localStorage.getItem(KEY);
+    window.localStorage.setItem(KEY+".test","1");
+    window.localStorage.removeItem(KEY+".test");
+  }catch(err){ speicherOk=false; }
+  if(!speicherOk) zeigeBanner("Der Browser erlaubt keinen lokalen Speicher — Daten werden nicht dauerhaft gespeichert und gehen beim Schließen verloren.");
+  var s=leererState();
+  if(roh){
+    try{
+      var p=JSON.parse(roh);
+      if(p && typeof p==="object"){
+        s.tage = p.tage||{};
+        var std=standardEinstellungen();
+        for(var k in std){ if(p.einstellungen && p.einstellungen[k]!==undefined) std[k]=p.einstellungen[k]; }
+        if(!std.kernzeiten||typeof std.kernzeiten!=="object") std.kernzeiten=standardEinstellungen().kernzeiten;
+        if(!Array.isArray(std.arbeitstage)||std.arbeitstage.length!==7) std.arbeitstage=standardEinstellungen().arbeitstage;
+        if(!Array.isArray(std.pausenstufen)||!std.pausenstufen.length) std.pausenstufen=standardEinstellungen().pausenstufen;
+        s.einstellungen=std;
+      }
+    }catch(err){
+      zeigeBanner("Die gespeicherten Daten konnten nicht gelesen werden — es wurde mit einem leeren Bestand gestartet.");
+    }
+  } else {
+    /* Erststart: ab heute zählen, damit zurückliegende Tage ohne Buchung kein Minus erzeugen */
+    s.einstellungen.stichtag = keyOf(new Date());
+  }
+  state=s;
+}
+function speichern(){
+  seq++;
+  _kontoCache={};
+  if(!speicherOk) return;
+  try{ window.localStorage.setItem(KEY, JSON.stringify(state)); }
+  catch(err){
+    speicherOk=false;
+    zeigeBanner("Speichern nicht möglich (Speicher voll oder gesperrt) — Daten werden nicht dauerhaft gespeichert.");
+  }
+}
+function E(){ return state.einstellungen; }
+function tagObj(key,anlegen){
+  if(!state.tage[key] && anlegen) state.tage[key]={intervalle:[],korrekturen:[]};
+  var t=state.tage[key];
+  if(t){ if(!t.intervalle) t.intervalle=[]; if(!t.korrekturen) t.korrekturen=[]; }
+  return t||null;
+}
+function aufraeumen(key){
+  var t=state.tage[key];
+  if(!t) return;
+  if((!t.intervalle||!t.intervalle.length) && (!t.korrekturen||!t.korrekturen.length) && !t.art && !t.notiz) delete state.tage[key];
+}
+
+/* =========================================================================
+   Berechnung mit Kontext
+   ========================================================================= */
+function heuteKey(){ return keyOf(new Date()); }
+function jetztMinuten(){ var d=new Date(); return d.getHours()*60+d.getMinutes(); }
+function tagRechnung(key){
+  var v=dateOf(key); v.setDate(v.getDate()-1);
+  var st=E().stichtag;
+  return berechneTag(key, state.tage[key]||null, E(), {
+    jetztMin: (key===heuteKey()? jetztMinuten() : null),
+    vortagEnde: letztesEnde(state.tage[keyOf(v)]),
+    vorStichtag: !!(st && key < st)
+  });
+}
+var _kontoCache={};
+function kontostandBis(bisKey){
+  if(_kontoCache[bisKey]!==undefined) return _kontoCache[bisKey];
+  var e=E(), hk=heuteKey();
+  var ende = bisKey<hk ? bisKey : hk;
+  var summe=e.startKonto||0;
+  if(e.stichtag){
+    var d=dateOf(e.stichtag), endD=dateOf(ende), n=0;
+    while(d<=endD && n<4000){
+      summe += tagRechnung(keyOf(d)).saldo;
+      d.setDate(d.getDate()+1); n++;
+    }
+  }
+  _kontoCache[bisKey]=summe;
+  return summe;
+}
+function monatsTage(jahr,monat){
+  var out=[], n=tageImMonat(jahr,monat);
+  for(var t=1;t<=n;t++) out.push(jahr+"-"+pad2(monat+1)+"-"+pad2(t));
+  return out;
+}
+function monatsBilanz(jahr,monat){
+  var keys=monatsTage(jahr,monat), hk=heuteKey();
+  var b={soll:0,ist:0,saldo:0,urlaub:0,krank:0,gleit:0,dienstgang:0,pause:0,tage:[],warnungen:[],maxAbs:0,kuenftig:false};
+  var wochen={};
+  keys.forEach(function(k){
+    var r=tagRechnung(k);
+    b.tage.push(r);
+    if(k<=hk){
+      b.soll+=r.soll; b.ist+=r.ist; b.saldo+=r.saldo;
+      b.dienstgang+=r.dienstgangSumme; b.pause+=r.gebuchtePause;
+      if(r.art==="urlaub") b.urlaub+=1; else if(r.art==="urlaub_halb") b.urlaub+=0.5;
+      if(r.art==="krank") b.krank+=1;
+      if(r.art==="gleittag") b.gleit+=1; else if(r.art==="gleittag_halb") b.gleit+=0.5;
+      var wk=isoWocheKey(dateOf(k));
+      wochen[wk]=(wochen[wk]||0)+r.netto;
+    } else b.kuenftig=true;
+    if(Math.abs(r.saldo)>b.maxAbs) b.maxAbs=Math.abs(r.saldo);
+    r.warnungen.forEach(function(x){ b.warnungen.push({key:k,typ:x.typ,text:x.text}); });
+  });
+  for(var wk2 in wochen){
+    if(wochen[wk2]>E().maxWoche)
+      b.warnungen.push({key:null,typ:"warn",text:"Wochenarbeitszeit in "+wk2.split("-")[1]+" bei "+fmtDauer(wochen[wk2])+" h — über der Warngrenze von "+fmtDauer(E().maxWoche)+" h."});
+  }
+  return b;
+}
+function kontoWarnungen(){
+  var st=kontostandBis(heuteKey()), e=E(), out=[];
+  if(st < -e.kontoMinus) out.push("Zeitschuld "+fmtSaldo(st)+" h — unter der Grenze von −"+fmtDauer(e.kontoMinus)+" h.");
+  if(st > e.kontoPlus) out.push("Zeitguthaben "+fmtSaldo(st)+" h — über der Grenze von +"+fmtDauer(e.kontoPlus)+" h (im Original monatliche Kappung).");
+  return out;
+}
+
+/* =========================================================================
+   Router
+   ========================================================================= */
+var ansicht={seite:"stempel", jahr:new Date().getFullYear(), monat:new Date().getMonth(), reiter:"monat"};
+function route(){
+  var h=(location.hash||"").replace(/^#\/?/,"");
+  var seite = h.split("?")[0] || "stempel";
+  if(["stempel","info","einstellungen"].indexOf(seite)<0) seite="stempel";
+  ansicht.seite=seite;
+  var navs=document.querySelectorAll("[data-nav]");
+  for(var i=0;i<navs.length;i++)
+    navs[i].className = navs[i].getAttribute("data-nav")==="einstellungen"
+      ? "iconbtn"+(seite==="einstellungen"?" aktiv":"")
+      : (navs[i].getAttribute("data-nav")===seite?"aktiv":"");
+  zeichne();
+  window.scrollTo(0,0);
+}
+
+/* =========================================================================
+   Zeichnen
+   ========================================================================= */
+var view=document.getElementById("view");
+function esc(s){
+  return String(s===null||s===undefined?"":s).replace(/[&<>"']/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];
+  });
+}
+function zeichne(){
+  detailSchliessen(true);
+  if(ansicht.seite==="stempel") zeichneStempel();
+  else if(ansicht.seite==="info") zeichneInfo();
+  else zeichneEinstellungen();
+}
+
+/* ---------- Seite 1: Stempeluhr ---------- */
+var SVG={
+  kommen:'<svg viewBox="0 0 24 24"><path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4"/><path d="M10 8l4 4-4 4"/><path d="M14 12H3"/></svg>',
+  gehen:'<svg viewBox="0 0 24 24"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4"/><path d="M16 8l4 4-4 4"/><path d="M20 12H9"/></svg>',
+  pause:'<svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>',
+  dienstgang:'<svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>'
+};
+function zeichneStempel(){
+  var hk=heuteKey(), r=tagRechnung(hk);
+  var kw=kontoWarnungen();
+  var konto=kontostandBis(hk);
+  var mb=monatsBilanz(new Date().getFullYear(), new Date().getMonth());
+
+  var html='<div class="eng">';
+  html+='<div class="karte status" id="statuskarte" data-z=""></div>';
+  html+='<div class="tasten">'
+    +'<button class="taste kommen" data-akt="kommen">'+SVG.kommen+'<span>KOMMEN</span></button>'
+    +'<button class="taste gehen" data-akt="gehen">'+SVG.gehen+'<span>GEHEN</span></button>'
+    +'<button class="taste pause" data-akt="pause">'+SVG.pause+'<span id="pauseTxt">PAUSE</span></button>'
+    +'<button class="taste dienstgang" data-akt="dienstgang">'+SVG.dienstgang+'<span id="dgTxt">DIENSTGANG</span></button>'
+    +'</div>';
+
+  html+='<div class="karte pad" style="margin-top:14px">'
+    +'<div class="label">Stundenkonto</div><div class="konto">'
+    +'<div class="gross '+(konto>0?"p":konto<0?"m":"")+'" id="kontoGross">'+esc(fmtSaldo(konto))+'</div>'
+    +'<div class="neben">Saldo '+esc(MONATE[new Date().getMonth()])+': <strong class="'+(mb.saldo>0?"p":mb.saldo<0?"m":"")+'">'+esc(fmtSaldo(mb.saldo))+'</strong><br>'
+    +'<span style="font-size:12.5px">'+(E().stichtag
+        ? 'Stichtag '+esc(fmtDatum(E().stichtag))+', Startwert '+esc(fmtSaldo(E().startKonto))
+        : 'Kein Stichtag gesetzt — das Konto zählt noch nicht.')
+    +'<br>Stand einschließlich des heutigen Tages: Solange das Tagessoll nicht erreicht ist, zieht der laufende Tag das Konto ins Minus.</span></div></div>';
+  if(kw.length){
+    html+='<ul class="hinweise" style="margin-top:12px">';
+    kw.forEach(function(t){ html+='<li class="w"><span class="sym">!</span><span>'+esc(t)+'</span></li>'; });
+    html+='</ul>';
+  }
+  html+='</div>';
+
+  html+='<div class="karte pad" style="margin-top:14px">'
+    +'<div class="label">Heute · '+esc(WT_LANG[dateOf(hk).getDay()])+', '+esc(fmtDatum(hk))+(r.feiertag?' · '+esc(r.feiertag):'')+'</div>'
+    +'<div class="heute" id="heuteBox"></div>'
+    +'<ul class="hinweise" id="heuteHinweise" style="margin-top:12px"></ul></div>';
+
+  html+='<div class="aktionen noprint"><a class="gross-link" href="#/info">INFO — Monatsübersicht</a></div>';
+  html+='</div>';
+  view.innerHTML=html;
+
+  var tasten=view.querySelectorAll("[data-akt]");
+  for(var i=0;i<tasten.length;i++){
+    (function(b){ b.addEventListener("click", function(){ buchen(b.getAttribute("data-akt"), b); }); })(tasten[i]);
+  }
+  tick();
+}
+
+function offenesIv(typ){
+  var t=state.tage[heuteKey()];
+  if(!t||!t.intervalle) return -1;
+  for(var i=t.intervalle.length-1;i>=0;i--){
+    var x=t.intervalle[i];
+    if(x.typ===typ && (x.bis===null||x.bis===undefined||x.bis==="")) return i;
+  }
+  return -1;
+}
+var undoDaten=null, undoTimer=null;
+function merkeUndo(text){
+  var hk=heuteKey();
+  undoDaten={key:hk, snapshot:JSON.stringify(state.tage[hk]||null)};
+  var t=document.getElementById("toast");
+  t.innerHTML='<span>'+esc(text)+'</span><button id="undoBtn">Rückgängig</button>';
+  t.className="an";
+  document.getElementById("undoBtn").addEventListener("click", function(){
+    if(!undoDaten) return;
+    var snap=JSON.parse(undoDaten.snapshot);
+    if(snap===null) delete state.tage[undoDaten.key]; else state.tage[undoDaten.key]=snap;
+    speichern(); undoDaten=null; t.className=""; zeichne();
+  });
+  if(undoTimer) clearTimeout(undoTimer);
+  undoTimer=setTimeout(function(){ t.className=""; undoDaten=null; }, 60000);
+}
+function buchen(akt, btn){
+  var hk=heuteKey(), jetzt=fmtUhr(jetztMinuten());
+  var t=tagObj(hk,true), txt="", i;
+  if(akt==="kommen"){
+    if(offenesIv("arbeit")>=0) return;
+    t.intervalle.push({typ:"arbeit",von:jetzt,bis:null}); txt="Kommen "+jetzt+" gebucht.";
+  } else if(akt==="gehen"){
+    i=offenesIv("arbeit"); if(i<0) return;
+    t.intervalle[i].bis=jetzt; txt="Gehen "+jetzt+" gebucht.";
+  } else if(akt==="pause"){
+    i=offenesIv("pause");
+    if(i>=0){ t.intervalle[i].bis=jetzt; txt="Pause beendet um "+jetzt+"."; }
+    else { t.intervalle.push({typ:"pause",von:jetzt,bis:null}); txt="Pause begonnen um "+jetzt+"."; }
+  } else if(akt==="dienstgang"){
+    i=offenesIv("dienstgang");
+    if(i>=0){ t.intervalle[i].bis=jetzt; txt="Dienstgang beendet um "+jetzt+"."; }
+    else { t.intervalle.push({typ:"dienstgang",von:jetzt,bis:null}); txt="Dienstgang begonnen um "+jetzt+"."; }
+  }
+  merkeUndo(txt);
+  speichern();
+  if(btn){ btn.classList.remove("blitz"); void btn.offsetWidth; btn.classList.add("blitz"); }
+  tick();
+  var kg=document.getElementById("kontoGross");
+  if(kg){ var k=kontostandBis(hk); kg.textContent=fmtSaldo(k); kg.className="gross "+(k>0?"p":k<0?"m":""); }
+}
+
+/* Rechnerischer Feierabend inklusive noch fälliger Pflichtpause */
+function feierabend(hk){
+  var t=state.tage[hk];
+  if(!t) return null;
+  var i=offenesIv("arbeit");
+  if(i<0) return null;
+  var kopie=JSON.parse(JSON.stringify(t));
+  var start=Math.max(jetztMinuten(), parseZeit(kopie.intervalle[i].von)||0);
+  for(var ende=start; ende<=1440; ende++){
+    kopie.intervalle[i].bis=fmtUhr(ende);
+    var rr=berechneTag(hk, kopie, E(), {jetztMin:null, vortagEnde:null});
+    if(rr.ist>=rr.soll) return ende;
+  }
+  return null;
+}
+
+function tick(){
+  var sk=document.getElementById("statuskarte");
+  if(!sk) return;
+  var hk=heuteKey(), now=new Date();
+  var r=tagRechnung(hk);
+  var oA=offenesIv("arbeit"), oP=offenesIv("pause"), oD=offenesIv("dienstgang");
+  var zustand="Nicht eingestempelt", z="";
+  if(oP>=0){ zustand="Pause"; z="pause"; }
+  else if(oD>=0){ zustand="Dienstgang"; z="dienstgang"; }
+  else if(oA>=0){ zustand="Arbeitszeit läuft"; z="arbeit"; }
+
+  var t=state.tage[hk], letzte=null;
+  if(t&&t.intervalle) t.intervalle.forEach(function(x){
+    var a=parseZeit(x.von), b=(x.bis?parseZeit(x.bis):null);
+    if(a!==null&&(letzte===null||a>letzte)) letzte=a;
+    if(b!==null&&(letzte===null||b>letzte)) letzte=b;
+  });
+  var seitTxt="Heute noch keine Buchung.";
+  if(letzte!==null){
+    var sek=(now.getHours()*3600+now.getMinutes()*60+now.getSeconds())-letzte*60;
+    if(sek<0) sek=0;
+    seitTxt="Seit der letzten Buchung ("+fmtUhr(letzte)+"): "+Math.floor(sek/3600)+":"+pad2(Math.floor((sek%3600)/60))+":"+pad2(sek%60);
+  }
+  sk.setAttribute("data-z",z);
+  sk.innerHTML='<div class="zeile1"><span class="zustand">'+esc(zustand)+'</span>'
+    +'<span class="marker">'+(z===""?"aus":z==="arbeit"?"läuft":z==="pause"?"Pause":"unterwegs")+'</span>'
+    +'<span class="uhr">'+pad2(now.getHours())+":"+pad2(now.getMinutes())+":"+pad2(now.getSeconds())+'</span></div>'
+    +'<div class="seit">'+esc(seitTxt)+'</div>';
+
+  var kn=document.querySelector('[data-akt="kommen"]');
+  if(kn){
+    var ge=document.querySelector('[data-akt="gehen"]'),
+        pa=document.querySelector('[data-akt="pause"]'),
+        dg=document.querySelector('[data-akt="dienstgang"]');
+    kn.disabled = oA>=0;
+    ge.disabled = !(oA>=0) || oP>=0 || oD>=0;
+    pa.disabled = !(oA>=0) || oD>=0;
+    dg.disabled = oP>=0;
+    kn.title = kn.disabled ? "Es läuft bereits eine Arbeitszeit." : "";
+    ge.title = ge.disabled ? (oA<0?"Zuerst „Kommen“ buchen.":"Zuerst Pause bzw. Dienstgang beenden.") : "";
+    pa.title = pa.disabled ? (oA<0?"Pause erst nach „Kommen“ möglich.":"Zuerst den Dienstgang beenden.") : "";
+    dg.title = dg.disabled ? "Zuerst die Pause beenden." : "";
+    document.getElementById("pauseTxt").textContent = oP>=0?"PAUSE BEENDEN":"PAUSE";
+    document.getElementById("dgTxt").textContent = oD>=0?"DIENSTGANG BEENDEN":"DIENSTGANG";
+  }
+
+  var hb=document.getElementById("heuteBox");
+  if(hb){
+    var rest=r.soll-r.ist, fa=feierabend(hk);
+    hb.innerHTML=
+       '<div><div class="k">Bisher gearbeitet</div><div class="v">'+fmtDauer(r.ist)+' h</div></div>'
+      +'<div><div class="k">Pause bisher</div><div class="v">'+fmtDauer(r.gebuchtePause)+' h</div></div>'
+      +'<div><div class="k">Bis Tagessoll</div><div class="v">'+(rest>0?fmtDauer(rest)+" h":"erfüllt")+'</div></div>'
+      +'<div><div class="k">Rechn. Feierabend</div><div class="v">'+(rest<=0?"erreicht":(fa!==null?fmtUhr(fa):"—"))+'</div></div>';
+    document.getElementById("heuteHinweise").innerHTML = r.warnungen.length
+      ? r.warnungen.map(function(x){ return '<li class="'+(x.typ==="warn"?"w":"i")+'"><span class="sym">'+(x.typ==="warn"?"!":"i")+'</span><span>'+esc(x.text)+'</span></li>'; }).join("")
+      : '<li class="i"><span class="sym">✓</span><span>Keine Hinweise für heute.</span></li>';
+  }
+}
+
+/* ---------- Seite 2: Info ---------- */
+function zeichneInfo(){
+  var h='<div id="druckkopf">'
+    +'<div class="dtitel">Zeitnachweis '+esc(MONATE[ansicht.monat])+' '+ansicht.jahr+'</div>'
+    +'<div class="dzeile">'+(E().name?esc(E().name)+' · ':'')+'Private Parallelaufzeichnung · gedruckt am '+esc(fmtDatum(heuteKey()))+'</div></div>';
+  h+='<div class="reiter noprint">'
+    +'<button data-reiter="monat" class="'+(ansicht.reiter==="monat"?"aktiv":"")+'">Monat</button>'
+    +'<button data-reiter="jahr" class="'+(ansicht.reiter==="jahr"?"aktiv":"")+'">Jahr</button></div>';
+  h+='<div id="infoInhalt"></div>';
+  view.innerHTML=h;
+  var rs=view.querySelectorAll("[data-reiter]");
+  for(var i=0;i<rs.length;i++)
+    (function(b){ b.addEventListener("click", function(){ ansicht.reiter=b.getAttribute("data-reiter"); zeichneInfo(); }); })(rs[i]);
+  if(ansicht.reiter==="monat") zeichneMonat(); else zeichneJahr();
+}
+
+function kachel(k,v,cls){ return '<div><div class="k">'+esc(k)+'</div><div class="v '+cls+'">'+esc(v)+'</div></div>'; }
+function kachelnHtml(b,kEnde){
+  return kachel("Soll"+(b.kuenftig?" bis heute":""), fmtDauer(b.soll)+" h","")
+   +kachel("Ist", fmtDauer(b.ist)+" h","")
+   +kachel("Saldo", fmtSaldo(b.saldo)+" h", b.saldo>0?"p":b.saldo<0?"m":"")
+   +kachel("Konto Ende", fmtSaldo(kEnde)+" h", kEnde>0?"p":kEnde<0?"m":"")
+   +kachel("Urlaub", zahl(b.urlaub)+" Tg.","")
+   +kachel("Krank", zahl(b.krank)+" Tg.","")
+   +kachel("Gleittage", zahl(b.gleit)+" Tg.","")
+   +kachel("Dienstgänge", fmtDauer(b.dienstgang)+" h","")
+   +kachel("Pausen", fmtDauer(b.pause)+" h","");
+}
+function zahl(n){ return (n%1)? String(n).replace(".",",") : String(n); }
+function letzterTagKey(){ return ansicht.jahr+"-"+pad2(ansicht.monat+1)+"-"+pad2(tageImMonat(ansicht.jahr,ansicht.monat)); }
+
+function zeichneMonat(){
+  var b=monatsBilanz(ansicht.jahr,ansicht.monat);
+  var kEnde=kontostandBis(letzterTagKey());
+
+  var h='<div class="monatsleiste noprint">'
+   +'<button class="btn" id="mPrev" aria-label="Vorheriger Monat">‹</button>'
+   +'<div class="titel">'+esc(MONATE[ansicht.monat])+' '+ansicht.jahr+'</div>'
+   +'<button class="btn" id="mNext" aria-label="Nächster Monat">›</button>'
+   +'<button class="btn" id="mHeute">Aktueller Monat</button>'
+   +'<select id="mSel" style="width:auto;min-width:132px" aria-label="Monat">'
+     +MONATE.map(function(n,i){return '<option value="'+i+'"'+(i===ansicht.monat?' selected':'')+'>'+n+'</option>';}).join("")
+   +'</select>'
+   +'<input type="number" id="jSel" value="'+ansicht.jahr+'" style="width:104px" step="1" aria-label="Jahr">'
+   +'<button class="btn" id="btnDruck" style="margin-left:auto">Drucken / PDF</button>'
+   +'<button class="btn" id="btnCsv">CSV</button></div>';
+
+  h+='<div class="kacheln">'+kachelnHtml(b,kEnde)+'</div>';
+
+  var kw=kontoWarnungen();
+  h+='<div id="warnBox">'+warnHtml(b,kw)+'</div>';
+
+  h+='<div class="tabwrap"><table class="monat"><thead><tr>'
+   +'<th>Datum</th><th>Tag</th><th>Art</th><th>Kommen</th><th>Gehen</th>'
+   +'<th>Pause</th><th class="r">Pause h</th><th>Dienstgang</th><th class="r">Dg. h</th>'
+   +'<th class="r">Brutto</th><th class="r">Abzug</th><th class="r">Ist</th><th class="r">Soll</th><th class="r">Saldo</th><th>Notiz</th>'
+   +'</tr></thead><tbody id="tbody">';
+  b.tage.forEach(function(r){ h+=zeile(r,b.maxAbs); });
+  h+='</tbody></table></div>';
+  h+='<div class="legende noprint">Berechnete Werte stehen in gedämpfter Schrift. <span class="stift">✎</span> = manuell gesetzte Tagesart, '
+   +'<span class="mark" style="vertical-align:baseline">K</span> = Zeitkorrektur aus „Sonstige Ergänzungen“, '
+   +'<span class="mark" style="vertical-align:baseline">P</span> = private Unterbrechung, '
+   +'<span class="mark" style="vertical-align:baseline">▲</span> = gekappte Minuten, '
+   +'<span class="mark" style="vertical-align:baseline">!</span> = Warnung. Ein Klick auf Art oder Notiz öffnet das Tagesdetail.</div>';
+  h+='<div class="unterschrift"><span>Datum, Unterschrift</span><span>Monatssaldo '+fmtSaldo(b.saldo)+' h · Kontostand '+fmtSaldo(kEnde)+' h</span></div>';
+
+  document.getElementById("infoInhalt").innerHTML=h;
+  monatEvents();
+}
+function warnHtml(b,kw){
+  if(!b.warnungen.length && !kw.length) return "";
+  var h='<div class="karte pad" style="margin-bottom:14px"><div class="label">Hinweise und Warnungen ('+(b.warnungen.length+kw.length)+')</div><ul class="hinweise">';
+  kw.forEach(function(t){ h+='<li class="w"><span class="sym">!</span><span>'+esc(t)+'</span></li>'; });
+  b.warnungen.forEach(function(x){
+    h+='<li class="'+(x.typ==="warn"?"w":"i")+'"><span class="sym">'+(x.typ==="warn"?"!":"i")+'</span><span>'
+      +(x.key?'<strong>'+esc(fmtDatumKurz(x.key))+'</strong> ':'')+esc(x.text)+'</span>'
+      +(x.key?'<button class="noprint" data-spring="'+x.key+'">zum Tag</button>':'')+'</li>';
+  });
+  return h+'</ul></div>';
+}
+function zeile(r,maxAbs){
+  var t=state.tage[r.key]||{};
+  var frei=(r.art==="wochenende"||r.art==="feiertag");
+  var cls=(frei?"frei ":"")+(r.key===heuteKey()?"heute":"");
+  var p1=r.pausen[0], d1=r.dienstgaenge[0];
+  var extraP=r.pausen.length>1?'<span class="mark" title="'+r.pausen.length+' Pausen — im Tagesdetail">+'+(r.pausen.length-1)+'</span>':'';
+  var extraD=r.dienstgaenge.length>1?'<span class="mark" title="'+r.dienstgaenge.length+' Dienstgänge — im Tagesdetail">+'+(r.dienstgaenge.length-1)+'</span>':'';
+  var warnMark=r.warnungen.some(function(x){return x.typ==="warn";})?'<span class="mark" title="Warnung — Tagesdetail öffnen">!</span>':'';
+  return '<tr data-key="'+r.key+'" class="'+cls+'">'
+   +'<td>'+fmtDatum(r.key)+'</td>'
+   +'<td>'+WT_KURZ[r.dow]+'</td>'
+   +'<td class="c-art">'+artZelle(r,warnMark)+'</td>'
+   +'<td>'+inp(r.key,"kommen",r.kommen)+'</td>'
+   +'<td>'+inp(r.key,"gehen",r.gehen)+'</td>'
+   +'<td style="white-space:nowrap">'+inp(r.key,"pauseVon",p1?p1.a:null)+'<span class="bis">–</span>'+inp(r.key,"pauseBis",p1?p1.b:null)+extraP+'</td>'
+   +'<td class="r calc c-pause">'+(r.gebuchtePause?fmtDauer(r.gebuchtePause):"")+'</td>'
+   +'<td style="white-space:nowrap">'+inp(r.key,"dgVon",d1?d1.a:null)+'<span class="bis">–</span>'+inp(r.key,"dgBis",d1?d1.b:null)+extraD+'</td>'
+   +'<td class="r calc c-dg">'+(r.dienstgangSumme?fmtDauer(r.dienstgangSumme):"")+'</td>'
+   +'<td class="r calc c-brutto">'+bruttoZelle(r)+'</td>'
+   +'<td class="r calc c-abzug">'+abzugZelle(r)+'</td>'
+   +'<td class="r calc stark c-ist">'+((r.ist||r.hatDaten)?fmtDauer(r.ist):"")+'</td>'
+   +'<td class="r calc c-soll">'+sollZelle(r)+'</td>'
+   +'<td class="r c-saldo">'+saldoZelle(r,maxAbs)+'</td>'
+   +'<td class="c-notiz">'+notizZelle(r.key,t)+'</td></tr>';
+}
+function artZelle(r,warnMark){
+  return '<button class="artbtn" data-detail="'+r.key+'" title="'+esc(r.feiertag||r.artName)+' — Tagesdetail öffnen">'
+    +esc(r.feiertag||r.artName)+(r.artManuell?'<span class="stift">✎</span>':'')+(warnMark||'')+'</button>';
+}
+function notizZelle(key,t){
+  return '<button class="notizbtn" data-detail="'+key+'" title="Tagesdetail öffnen">'+(t.notiz?esc(t.notiz):'<span style="opacity:.45">+</span>')+'</button>';
+}
+function bruttoZelle(r){
+  return (r.brutto?fmtDauer(r.brutto):"")
+    +(r.korrektur?'<span class="mark" title="Zeitkorrektur '+fmtSaldo(r.korrektur)+' h">K</span>':"")
+    +(r.privat?'<span class="mark" title="private Unterbrechung '+fmtDauer(r.privat)+' h abgezogen">P</span>':"");
+}
+function abzugZelle(r){
+  return (r.abzug?fmtDauer(r.abzug):"")
+    +(r.gekappt?'<span class="mark" title="'+fmtDauer(r.gekappt)+' h gekappt">▲</span>':"");
+}
+function inp(key,feld,min){
+  return '<input class="t" type="text" inputmode="numeric" autocomplete="off" data-key="'+key+'" data-feld="'+feld
+    +'" value="'+(min===null||min===undefined?"":fmtUhr(min))+'" placeholder="––:––" aria-label="'+feld+' '+fmtDatum(key)+'">';
+}
+function ausserhalb(r){
+  /* nur an Tagen markieren, die sonst ein Soll hätten — sonst reines Rauschen */
+  return r.vorStichtag && r.istArbeitstag && r.art!=="wochenende" && r.art!=="feiertag";
+}
+function sollZelle(r){
+  if(ausserhalb(r)) return '<span title="Liegt vor dem Stichtag — zählt nicht ins Konto.">–</span>';
+  return r.soll?fmtDauer(r.soll):"";
+}
+function saldoZelle(r,maxAbs){
+  if(ausserhalb(r)) return '<span class="calc" title="Liegt vor dem Stichtag — zählt nicht ins Konto.">–</span>';
+  var m=Math.max(maxAbs,60);
+  var w=Math.min(50, Math.abs(r.saldo)/m*50);
+  var txt=(r.hatDaten||r.saldo)?'<span class="'+(r.saldo>0?"p":r.saldo<0?"m":"")+'" style="font-weight:600">'+fmtSaldo(r.saldo)+'</span>':'';
+  var bar=Math.abs(r.saldo)>0
+    ? '<span class="bar"><span class="bfill '+(r.saldo>=0?"p":"m")+'" style="'+(r.saldo>=0?"left:50%;":"right:50%;")+"width:"+w+'%"></span></span>'
+    : '';
+  return txt+bar;
+}
+
+function monatEvents(){
+  var g=function(id){ return document.getElementById(id); };
+  g("mPrev").addEventListener("click",function(){ ansicht.monat--; if(ansicht.monat<0){ansicht.monat=11;ansicht.jahr--;} zeichneMonat(); });
+  g("mNext").addEventListener("click",function(){ ansicht.monat++; if(ansicht.monat>11){ansicht.monat=0;ansicht.jahr++;} zeichneMonat(); });
+  g("mHeute").addEventListener("click",function(){ ansicht.jahr=new Date().getFullYear(); ansicht.monat=new Date().getMonth(); zeichneMonat(); });
+  g("mSel").addEventListener("change",function(){ ansicht.monat=+this.value; zeichneMonat(); });
+  g("jSel").addEventListener("change",function(){ var v=parseInt(this.value,10); if(v>1990&&v<2200){ansicht.jahr=v; zeichneMonat();} });
+  g("btnDruck").addEventListener("click",function(){ window.print(); });
+  g("btnCsv").addEventListener("click",csvExport);
+  springLinks();
+  var tb=g("tbody");
+  tb.addEventListener("click",function(ev){
+    var d=ev.target.closest?ev.target.closest("[data-detail]"):null;
+    if(d) detailOeffnen(d.getAttribute("data-detail"));
+  });
+  tb.addEventListener("input",function(ev){
+    if(ev.target.className.indexOf("t")>=0 && ev.target.tagName==="INPUT") feldSetzen(ev.target,false);
+  });
+  tb.addEventListener("change",function(ev){
+    if(ev.target.className.indexOf("t")>=0 && ev.target.tagName==="INPUT") feldSetzen(ev.target,true);
+  });
+}
+function springLinks(){
+  var xs=document.querySelectorAll("[data-spring]");
+  for(var i=0;i<xs.length;i++)
+    (function(x){ x.addEventListener("click",function(){ springeZu(x.getAttribute("data-spring")); }); })(xs[i]);
+}
+function springeZu(key){
+  var jr=parseInt(key.slice(0,4),10), mo=parseInt(key.slice(5,7),10)-1;
+  if(jr!==ansicht.jahr||mo!==ansicht.monat){ ansicht.jahr=jr; ansicht.monat=mo; zeichneMonat(); }
+  var tr=document.querySelector('tr[data-key="'+key+'"]');
+  if(tr){
+    tr.scrollIntoView({block:"center",behavior:"smooth"});
+    tr.classList.remove("blink"); void tr.offsetWidth; tr.classList.add("blink");
+  }
+}
+
+/* Tabellenfeld -> Zustand. Die Eingabefelder werden nie ersetzt, damit der Fokus bleibt. */
+function feldSetzen(el, normalisieren){
+  var key=el.getAttribute("data-key"), feld=el.getAttribute("data-feld");
+  var roh=el.value.trim();
+  var min = roh==="" ? null : parseZeit(roh);
+  if(roh!=="" && min===null){ if(normalisieren) el.value=""; else return; }
+  var t=tagObj(key,true);
+  var wert = min===null ? null : fmtUhr(min);
+
+  function idx(typ,welche){
+    if(welche==="erster"){ for(var i=0;i<t.intervalle.length;i++) if(t.intervalle[i].typ===typ) return i; }
+    else { for(var j=t.intervalle.length-1;j>=0;j--) if(t.intervalle[j].typ===typ) return j; }
+    return -1;
+  }
+  function setze(typ, welche, teil){
+    var i = idx(typ,welche);
+    if(i<0){
+      if(wert===null) return;
+      var neu={typ:typ,von:null,bis:null}; neu[teil]=wert; t.intervalle.push(neu); return;
+    }
+    t.intervalle[i][teil]=wert;
+    var x=t.intervalle[i];
+    if((x.von===null||x.von==="") && (x.bis===null||x.bis==="")) t.intervalle.splice(i,1);
+  }
+  if(feld==="kommen") setze("arbeit","erster","von");
+  else if(feld==="gehen") setze("arbeit","letzter","bis");
+  else if(feld==="pauseVon") setze("pause","erster","von");
+  else if(feld==="pauseBis") setze("pause","erster","bis");
+  else if(feld==="dgVon") setze("dienstgang","erster","von");
+  else if(feld==="dgBis") setze("dienstgang","erster","bis");
+
+  aufraeumen(key);
+  speichern();
+  if(normalisieren) el.value = wert||"";
+  livePatch(key);
+}
+function livePatch(key){
+  var b=monatsBilanz(ansicht.jahr,ansicht.monat), r=null;
+  for(var i=0;i<b.tage.length;i++) if(b.tage[i].key===key) r=b.tage[i];
+  var tr=document.querySelector('tr[data-key="'+key+'"]');
+  if(r&&tr){
+    var q=function(s){ return tr.querySelector(s); };
+    q(".c-pause").innerHTML  = r.gebuchtePause?fmtDauer(r.gebuchtePause):"";
+    q(".c-dg").innerHTML     = r.dienstgangSumme?fmtDauer(r.dienstgangSumme):"";
+    q(".c-brutto").innerHTML = bruttoZelle(r);
+    q(".c-abzug").innerHTML  = abzugZelle(r);
+    q(".c-ist").innerHTML    = (r.ist||r.hatDaten)?fmtDauer(r.ist):"";
+    q(".c-soll").innerHTML   = sollZelle(r);
+    q(".c-saldo").innerHTML  = saldoZelle(r,b.maxAbs);
+    var wm=r.warnungen.some(function(x){return x.typ==="warn";})?'<span class="mark" title="Warnung — Tagesdetail öffnen">!</span>':'';
+    q(".c-art").innerHTML    = artZelle(r,wm);
+  }
+  var kach=document.querySelector(".kacheln");
+  if(kach) kach.innerHTML=kachelnHtml(b,kontostandBis(letzterTagKey()));
+  var wb=document.getElementById("warnBox");
+  if(wb){ wb.innerHTML=warnHtml(b,kontoWarnungen()); springLinks(); }
+}
+
+/* ---------- Jahresansicht ---------- */
+function zeichneJahr(){
+  var j=ansicht.jahr;
+  var h='<div class="monatsleiste noprint">'
+   +'<button class="btn" id="jPrev" aria-label="Vorjahr">‹</button>'
+   +'<div class="titel">Jahr '+j+'</div>'
+   +'<button class="btn" id="jNext" aria-label="Folgejahr">›</button></div>';
+  h+='<div class="karte pad"><table class="jahrtab"><thead><tr><th>Monat</th><th class="r">Soll</th><th class="r">Ist</th><th class="r">Saldo</th><th class="r">Kontostand Ende</th></tr></thead><tbody>';
+  var sSoll=0,sIst=0,sSaldo=0;
+  for(var m=0;m<12;m++){
+    var b=monatsBilanz(j,m);
+    var kst=kontostandBis(j+"-"+pad2(m+1)+"-"+pad2(tageImMonat(j,m)));
+    sSoll+=b.soll; sIst+=b.ist; sSaldo+=b.saldo;
+    var jetzt=(j===new Date().getFullYear()&&m===new Date().getMonth());
+    h+='<tr class="'+(jetzt?"jetzt":"")+'"><td><button class="artbtn" data-monat="'+m+'" style="font-weight:inherit">'+MONATE[m]+'</button></td>'
+      +'<td class="r">'+fmtDauer(b.soll)+'</td><td class="r">'+fmtDauer(b.ist)+'</td>'
+      +'<td class="r '+(b.saldo>0?"p":b.saldo<0?"m":"")+'">'+fmtSaldo(b.saldo)+'</td>'
+      +'<td class="r '+(kst>0?"p":kst<0?"m":"")+'">'+fmtSaldo(kst)+'</td></tr>';
+  }
+  h+='<tr style="border-top:2px solid var(--line-stark);font-weight:700"><td style="padding-left:8px">Summe '+j+'</td>'
+    +'<td class="r">'+fmtDauer(sSoll)+'</td><td class="r">'+fmtDauer(sIst)+'</td>'
+    +'<td class="r '+(sSaldo>0?"p":sSaldo<0?"m":"")+'">'+fmtSaldo(sSaldo)+'</td><td class="r">—</td></tr>';
+  h+='</tbody></table><p class="hint">Kontostand = Anfangswert aus den Einstellungen zuzüglich aller Tagessalden ab dem Stichtag; künftige Tage bleiben unberücksichtigt.</p></div>';
+  document.getElementById("infoInhalt").innerHTML=h;
+  document.getElementById("jPrev").addEventListener("click",function(){ ansicht.jahr--; zeichneJahr(); });
+  document.getElementById("jNext").addEventListener("click",function(){ ansicht.jahr++; zeichneJahr(); });
+  var ms=document.querySelectorAll("[data-monat]");
+  for(var i=0;i<ms.length;i++)
+    (function(a){ a.addEventListener("click",function(){ ansicht.monat=+a.getAttribute("data-monat"); ansicht.reiter="monat"; zeichneInfo(); }); })(ms[i]);
+}
+
+/* =========================================================================
+   Tagesdetail
+   ========================================================================= */
+var detailKey=null;
+function detailOeffnen(key){
+  detailKey=key;
+  document.getElementById("backdrop").className="an";
+  document.getElementById("detail").className="an";
+  detailZeichnen();
+}
+function detailSchliessen(still){
+  var war=detailKey;
+  detailKey=null;
+  var d=document.getElementById("detail"), b=document.getElementById("backdrop");
+  if(d) d.className=""; if(b) b.className="";
+  if(!still && war && ansicht.seite==="info" && ansicht.reiter==="monat") zeichneMonat();
+}
+function rz(k,v,cls){ return '<tr class="'+(cls||"")+'"><td>'+k+'</td><td>'+v+'</td></tr>'; }
+function ivBlock(typ,titel,kurz,t){
+  var liste=[];
+  (t.intervalle||[]).forEach(function(x,i){ if(x.typ===typ) liste.push({x:x,i:i}); });
+  var h='<h3>'+esc(titel)+'</h3><div class="ivliste">';
+  if(!liste.length) h+='<p class="hint" style="margin:0">Keine Buchung.</p>';
+  liste.forEach(function(o){
+    h+='<div class="ivzeile">'
+      +'<input class="t" type="text" inputmode="numeric" data-iv="'+o.i+'" data-teil="von" value="'+esc(o.x.von||"")+'" placeholder="––:––" aria-label="Beginn">'
+      +'<span class="bis">bis</span>'
+      +'<input class="t" type="text" inputmode="numeric" data-iv="'+o.i+'" data-teil="bis" value="'+esc(o.x.bis||"")+'" placeholder="offen" aria-label="Ende">'
+      +'<button class="del" data-ivdel="'+o.i+'" aria-label="Zeile löschen">✕</button></div>';
+  });
+  return h+'</div><button class="addbtn" data-ivadd="'+typ+'">+ '+esc(kurz)+' hinzufügen</button>';
+}
+function detailZeichnen(){
+  var key=detailKey; if(!key) return;
+  var r=tagRechnung(key);
+  var t=state.tage[key]||{intervalle:[],korrekturen:[],notiz:""};
+  var h='<div class="dkopf">'
+   +'<div><div class="dt">'+esc(WT_LANG[r.dow])+', '+esc(fmtDatum(key))+'</div>'
+   +'<div class="ds">'+(r.feiertag?esc(r.feiertag)+' · ':'')+'Tagessoll '+fmtDauer(r.tagessoll)+' h</div></div>'
+   +'<button class="iconbtn" id="dClose" style="margin-left:auto" aria-label="Schließen">✕</button></div><div class="dbody">';
+  if(r.vorStichtag)
+    h+='<ul class="hinweise" style="margin-bottom:14px"><li class="i"><span class="sym">i</span><span>Dieser Tag liegt vor dem Stichtag ('
+      +esc(fmtDatum(E().stichtag))+') und zählt weder ins Zeitkonto noch in die Monatssumme.</span></li></ul>';
+
+  h+='<div class="feld"><label for="dArt">Tagesart</label><select id="dArt">';
+  ART_REIHE.forEach(function(a){
+    h+='<option value="'+a+'"'+(a===r.art?' selected':'')+'>'+esc(ARTEN[a].name)+(a===r.autoArt?' (automatisch)':'')+'</option>';
+  });
+  h+='</select>'+(r.artManuell?'<div class="sub">Manuell gesetzt. <button class="btn" id="dArtReset" style="min-height:34px;padding:0 9px;margin-top:6px">Auf „'+esc(ARTEN[r.autoArt].name)+'“ zurücksetzen</button></div>':'')+'</div>';
+
+  h+=ivBlock("arbeit","Arbeitszeit (Kommen – Gehen)","Arbeitszeit",t);
+  h+=ivBlock("pause","Pausen","Pause",t);
+  h+=ivBlock("dienstgang","Dienstgänge","Dienstgang",t);
+  h+=ivBlock("privat","Private Unterbrechungen","private Unterbrechung",t);
+
+  h+='<h3>Sonstige Ergänzungen</h3>'
+   +'<p class="hint" style="margin-bottom:6px">Zeitkorrekturen in Minuten mit Begründung — z. B. „Sitzung Stadtrat, 90 Min“, „Dienstreise vom Wohnort angetreten“, „vergessene Gehen-Buchung“. Negative Werte ziehen Zeit ab.</p>'
+   +'<div class="ivliste">';
+  (t.korrekturen||[]).forEach(function(k,i){
+    var fehlt = k.min && !k.grund;
+    h+='<div class="ivzeile"><input class="z" type="text" inputmode="numeric" data-korr="'+i+'" data-teil="min" value="'+esc(k.min)+'" aria-label="Minuten">'
+      +'<input class="g" type="text" data-korr="'+i+'" data-teil="grund" value="'+esc(k.grund||"")+'" placeholder="Begründung (Pflicht)" aria-label="Begründung"'
+      +(fehlt?' style="border-color:var(--warn)"':'')+'>'
+      +'<button class="del" data-korrdel="'+i+'" aria-label="Korrektur löschen">✕</button></div>';
+  });
+  h+='</div><button class="addbtn" id="korrAdd">+ Zeitkorrektur hinzufügen</button>';
+
+  h+='<div class="feld" style="margin-top:18px"><label for="dNotiz">Notiz</label><textarea id="dNotiz" placeholder="Freitext für diesen Tag">'+esc(t.notiz||"")+'</textarea></div>';
+
+  h+='<h3>Berechnung im Einzelnen</h3><table class="rechnung">'
+   +rz("Arbeitsintervalle (Kommen → Gehen)", fmtDauer(r.arbeitSumme)+" h")
+   +(r.dienstgangSumme?rz("Dienstgänge gesamt", fmtDauer(r.dienstgangSumme)+" h","zwi"):"")
+   +(r.dienstgangSumme?rz("davon außerhalb der Anwesenheit (+)", fmtDauer(r.dienstgangAussen)+" h","zwi"):"")
+   +(r.korrektur?rz("Zeitkorrekturen", fmtSaldo(r.korrektur)+" h"):"")
+   +(r.privat?rz("private Unterbrechungen (−)", "−"+fmtDauer(r.privat)+" h"):"")
+   +rz("<strong>Brutto-Anwesenheit</strong>", "<strong>"+fmtDauer(r.brutto)+" h</strong>")
+   +rz("gebuchte Pause", fmtDauer(r.gebuchtePause)+" h","zwi")
+   +rz("Pflichtpause nach § 4 ArbZG", fmtDauer(r.pflichtPause)+" h","zwi")
+   +(r.zuschlag?rz("Verspätungszuschlag ("+esc(r.zuschlagInfo)+")", "+"+fmtDauer(r.zuschlag)+" h","zwi"):"")
+   +rz("<strong>Pausenabzug gesamt (−)</strong>", "<strong>−"+fmtDauer(r.abzug)+" h</strong>")
+   +(r.gekappt?rz("über "+fmtDauer(E().kappung)+" h gekappt (−)", "−"+fmtDauer(r.gekappt)+" h"):"")
+   +(r.gutschrift?rz("Gutschrift "+esc(r.artName), fmtDauer(r.gutschrift)+" h"):"")
+   +rz("<strong>Ist</strong>", "<strong>"+fmtDauer(r.ist)+" h</strong>","sum")
+   +rz("Soll", fmtDauer(r.soll)+" h")
+   +rz("<strong>Saldo</strong>", '<strong class="'+(r.saldo>0?"p":r.saldo<0?"m":"")+'">'+fmtSaldo(r.saldo)+" h</strong>","sum")
+   +'</table>';
+
+  if(r.warnungen.length){
+    h+='<h3>Hinweise</h3><ul class="hinweise">';
+    r.warnungen.forEach(function(x){ h+='<li class="'+(x.typ==="warn"?"w":"i")+'"><span class="sym">'+(x.typ==="warn"?"!":"i")+'</span><span>'+esc(x.text)+'</span></li>'; });
+    h+='</ul>';
+  }
+  h+='<div class="knopfreihe" style="margin-top:20px">'
+   +'<button class="btn prim" id="dFertig" style="flex:1;min-height:52px">Fertig</button>'
+   +'<button class="btn gefahr" id="dLeeren" style="min-height:52px">Tag leeren</button></div></div>';
+
+  document.getElementById("detail").innerHTML=h;
+  detailEvents();
+}
+function detailEvents(){
+  var d=document.getElementById("detail"), key=detailKey;
+  var alle=function(sel,fn){ var xs=d.querySelectorAll(sel); for(var i=0;i<xs.length;i++) fn(xs[i]); };
+  document.getElementById("dClose").addEventListener("click",function(){ detailSchliessen(); });
+  document.getElementById("dFertig").addEventListener("click",function(){ detailSchliessen(); });
+  document.getElementById("backdrop").onclick=function(){ detailSchliessen(); };
+  document.getElementById("dArt").addEventListener("change",function(){
+    var t=tagObj(key,true); t.art=this.value; aufraeumen(key); speichern(); detailZeichnen();
+  });
+  var ar=document.getElementById("dArtReset");
+  if(ar) ar.addEventListener("click",function(){ var t=tagObj(key,true); delete t.art; aufraeumen(key); speichern(); detailZeichnen(); });
+  document.getElementById("dNotiz").addEventListener("change",function(){
+    var t=tagObj(key,true); t.notiz=this.value.trim(); aufraeumen(key); speichern();
+  });
+  document.getElementById("dLeeren").addEventListener("click",function(){
+    if(!window.confirm("Alle Buchungen, Korrekturen und Notizen dieses Tages löschen?")) return;
+    delete state.tage[key]; speichern(); detailZeichnen();
+  });
+  alle("[data-ivadd]",function(b){
+    b.addEventListener("click",function(){
+      var t=tagObj(key,true);
+      t.intervalle.push({typ:b.getAttribute("data-ivadd"),von:"",bis:""});
+      speichern(); detailZeichnen();
+      var f=d.querySelectorAll('input[data-teil="von"]');
+      if(f.length) f[f.length-1].focus();
+    });
+  });
+  alle("[data-ivdel]",function(b){
+    b.addEventListener("click",function(){
+      var t=tagObj(key,true); t.intervalle.splice(+b.getAttribute("data-ivdel"),1);
+      aufraeumen(key); speichern(); detailZeichnen();
+    });
+  });
+  alle("input[data-iv]",function(el){
+    el.addEventListener("change",function(){
+      var t=tagObj(key,true), i=+el.getAttribute("data-iv"), teil=el.getAttribute("data-teil");
+      var roh=el.value.trim();
+      if(roh===""){ t.intervalle[i][teil]= (teil==="bis"?null:""); }
+      else{
+        var m=parseZeit(roh);
+        if(m===null){ el.value=t.intervalle[i][teil]||""; return; }
+        t.intervalle[i][teil]=fmtUhr(m);
+      }
+      speichern(); detailZeichnen();
+    });
+  });
+  document.getElementById("korrAdd").addEventListener("click",function(){
+    var t=tagObj(key,true); t.korrekturen.push({min:0,grund:""}); speichern(); detailZeichnen();
+    var f=d.querySelectorAll('input[data-teil="min"]'); if(f.length) f[f.length-1].focus();
+  });
+  alle("[data-korrdel]",function(b){
+    b.addEventListener("click",function(){
+      var t=tagObj(key,true); t.korrekturen.splice(+b.getAttribute("data-korrdel"),1);
+      aufraeumen(key); speichern(); detailZeichnen();
+    });
+  });
+  alle("input[data-korr]",function(el){
+    el.addEventListener("change",function(){
+      var t=tagObj(key,true), i=+el.getAttribute("data-korr"), teil=el.getAttribute("data-teil");
+      if(teil==="min"){
+        var v=parseInt(String(el.value).replace(/[^\-0-9]/g,""),10);
+        t.korrekturen[i].min = isFinite(v)?v:0;
+      } else t.korrekturen[i].grund=el.value.trim();
+      speichern(); detailZeichnen();
+    });
+  });
+}
+
+/* =========================================================================
+   Einstellungen
+   ========================================================================= */
+function chip(gruppe,wert,text,an){
+  return '<label class="chip '+(an?"an":"")+'"><input type="radio" name="'+gruppe+'" value="'+wert+'"'+(an?" checked":"")+'>'+esc(text)+'</label>';
+}
+function feldKurz(id,label,wert,sub){
+  return '<div class="feld" style="flex:1;min-width:158px"><label for="'+id+'">'+esc(label)+'</label>'
+    +'<input type="text" id="'+id+'" value="'+esc(wert)+'"><div class="sub">'+esc(sub)+'</div></div>';
+}
+function zeichneEinstellungen(){
+  var e=E();
+  var h='<div class="eng"><h1>Einstellungen</h1><p class="hint">Alle Rechenwerte stehen hier — nichts ist fest im Code verdrahtet. Änderungen wirken sofort auf alle Monate.</p>';
+
+  h+='<div class="karte pad" style="margin-top:16px"><h2 style="margin-top:0">Soll-Arbeitszeit</h2>'
+   +'<div class="feld"><label>Regelmäßige Wochenarbeitszeit</label><div class="chips">'
+   +chip("waz","2400","40:00 h (Beamte)",e.wochenarbeitszeit===2400)
+   +chip("waz","2340","39:00 h (Tarif)",e.wochenarbeitszeit===2340)
+   +chip("waz","frei","Freiwert",e.wochenarbeitszeit!==2400&&e.wochenarbeitszeit!==2340)
+   +'</div><div class="reihe" style="margin-top:8px"><input type="text" class="kurz" id="wazFrei" value="'+fmtDauer(e.wochenarbeitszeit)+'" aria-label="Wochenarbeitszeit"><span class="sub">Format H:MM</span></div></div>';
+  h+='<div class="feld"><label>Arbeitstage</label><div class="chips">';
+  [1,2,3,4,5,6,0].forEach(function(i){
+    h+='<label class="chip '+(e.arbeitstage[i]?"an":"")+'"><input type="checkbox" data-at="'+i+'"'+(e.arbeitstage[i]?" checked":"")+'>'+WT_KURZ[i]+'</label>';
+  });
+  h+='</div></div>';
+  h+='<div class="feld"><label class="schalter"><input type="checkbox" id="tsAuto"'+(e.tagessollAuto?" checked":"")+'>Tagessoll automatisch (Wochenarbeitszeit ÷ Anzahl Arbeitstage)</label>'
+   +'<div class="reihe"><input type="text" class="kurz" id="tsWert" value="'+fmtDauer(tagessollBerechnet(e))+'"'+(e.tagessollAuto?" disabled":"")+' aria-label="Tagessoll">'
+   +'<span class="sub">Aktuelles Tagessoll: <strong>'+fmtDauer(tagessollBerechnet(e))+' h</strong></span></div></div></div>';
+
+  h+='<div class="karte pad" style="margin-top:14px"><h2 style="margin-top:0">Rahmen- und Kernarbeitszeit</h2>'
+   +'<div class="feld"><label class="schalter"><input type="checkbox" id="rahmenAn"'+(e.rahmenPruefung?" checked":"")+'>Rahmenzeit prüfen</label>'
+   +'<div class="reihe"><input type="text" class="kurz" id="rahmenVon" value="'+esc(e.rahmenVon)+'" aria-label="Rahmenzeit von"><span class="sub">bis</span>'
+   +'<input type="text" class="kurz" id="rahmenBis" value="'+esc(e.rahmenBis)+'" aria-label="Rahmenzeit bis"></div>'
+   +'<div class="sub">Buchungen außerhalb sind erlaubt und werden nur als Hinweis markiert. Feiertage bleiben ausgenommen.</div></div>'
+   +'<div class="feld"><label class="schalter"><input type="checkbox" id="kernAn"'+(e.kernzeitPruefung?" checked":"")+'>Kernarbeitszeit prüfen</label>'
+   +'<div class="sub">Wird eine Kernzeit nicht abgedeckt, erscheint nur ein Hinweis — es wird nichts automatisch korrigiert.</div></div>';
+  [1,2,3,4,5,6,0].forEach(function(i){
+    var bl=(e.kernzeiten[String(i)]||[]);
+    h+='<div class="kernblock"><div class="wt">'+WT_LANG[i]+'</div>';
+    if(!bl.length) h+='<p class="hint" style="margin:0 0 6px">Keine Kernzeit.</p>';
+    bl.forEach(function(b,j){
+      h+='<div class="ivzeile" style="margin-bottom:6px">'
+       +'<input class="t" type="text" data-kern="'+i+'" data-j="'+j+'" data-teil="von" value="'+esc(b.von)+'" aria-label="Kernzeit von">'
+       +'<span class="bis">bis</span>'
+       +'<input class="t" type="text" data-kern="'+i+'" data-j="'+j+'" data-teil="bis" value="'+esc(b.bis)+'" aria-label="Kernzeit bis">'
+       +'<button class="del" data-kerndel="'+i+'" data-j="'+j+'" aria-label="Block löschen">✕</button></div>';
+    });
+    h+='<button class="addbtn" data-kernadd="'+i+'">+ Block</button></div>';
+  });
+  h+='</div>';
+
+  h+='<div class="karte pad" style="margin-top:14px"><h2 style="margin-top:0">Pausen und Grenzen</h2>'
+   +'<div class="feld"><label>Pausenstufen (§ 4 ArbZG)</label>';
+  e.pausenstufen.forEach(function(s,i){
+    h+='<div class="ivzeile" style="margin-bottom:6px"><span class="sub" style="white-space:nowrap;margin:0">über</span>'
+     +'<input class="t" type="text" data-stufe="'+i+'" data-teil="grenze" value="'+fmtDauer(s.grenze)+'" aria-label="Grenze">'
+     +'<span class="sub" style="white-space:nowrap;margin:0">h →</span>'
+     +'<input class="z" type="text" data-stufe="'+i+'" data-teil="pause" value="'+s.pause+'" aria-label="Pause in Minuten">'
+     +'<span class="sub" style="margin:0">min</span>'
+     +'<button class="del" data-stufedel="'+i+'" aria-label="Stufe löschen">✕</button></div>';
+  });
+  h+='<button class="addbtn" id="stufeAdd">+ Stufe</button></div>'
+   +'<div class="feld"><label class="schalter"><input type="checkbox" id="vzAn"'+(e.verspaetungszuschlag?" checked":"")+'>Verspätungszuschlag anwenden</label>'
+   +'<div class="sub">Wird die Pause erst nach dem Überschreiten der 6-Stunden-Grenze angetreten, wird die Zeit zwischen Grenze und Pausenantritt zusätzlich abgezogen. Für die 9-Stunden-Grenze gilt das sinngemäß; angesetzt wird der größere der beiden Zuschläge, nicht deren Summe.</div></div>'
+   +'<div class="reihe">'
+   +feldKurz("kappung","Kappungsgrenze Tag",fmtDauer(e.kappung),"H:MM · wird automatisch gekappt")
+   +feldKurz("maxWoche","Warngrenze Woche",fmtDauer(e.maxWoche),"H:MM · nur Warnung")
+   +feldKurz("ruhezeit","Mindestruhezeit",fmtDauer(e.ruhezeit),"H:MM · nur Warnung")
+   +'</div><div class="reihe">'
+   +feldKurz("kontoMinus","Grenze Zeitschuld",fmtDauer(e.kontoMinus),"H:MM · nur Warnung")
+   +feldKurz("kontoPlus","Grenze Zeitguthaben",fmtDauer(e.kontoPlus),"H:MM · nur Warnung")
+   +'</div></div>';
+
+  h+='<div class="karte pad" style="margin-top:14px"><h2 style="margin-top:0">Zeitkonto</h2><div class="reihe">'
+   +feldKurz("startKonto","Anfangs-Kontostand",fmtSaldo(e.startKonto),"z. B. +12:30 oder −3:15")
+   +'<div class="feld" style="flex:1;min-width:190px"><label for="stichtag">Stichtag</label><input type="date" id="stichtag" value="'+esc(e.stichtag)+'"></div></div>'
+   +'<p class="hint">Der Kontostand ist der Anfangswert zuzüglich aller Tagessalden ab dem Stichtag. Tage vor dem Stichtag zählen nicht ins Konto. Ohne Stichtag bleibt das Konto beim Anfangswert stehen.</p>'
+   +'<p class="hint" style="margin-top:8px"><strong>Aktueller Kontostand: '+fmtSaldo(kontostandBis(heuteKey()))+' h</strong></p></div>';
+
+  h+='<div class="karte pad" style="margin-top:14px"><h2 style="margin-top:0">Allgemein</h2>'
+   +'<div class="feld"><label for="land">Bundesland (Feiertage)</label><select id="land">'
+   +Object.keys(LAENDER).map(function(k){return '<option value="'+k+'"'+(k===e.land?" selected":"")+'>'+LAENDER[k]+'</option>';}).join("")
+   +'</select><div class="sub">Die beweglichen Feiertage werden über die Gauß’sche Osterformel für jedes Jahr berechnet.</div></div>'
+   +'<div class="feld"><label for="nameF">Name (für den Ausdruck)</label><input type="text" id="nameF" value="'+esc(e.name)+'" placeholder="Vorname Nachname"></div>'
+   +'<div class="feld"><label>Darstellung</label><div class="chips">'
+   +chip("theme","auto","Automatisch",e.theme==="auto")+chip("theme","hell","Hell",e.theme==="hell")+chip("theme","dunkel","Dunkel",e.theme==="dunkel")
+   +'</div></div></div>';
+
+  h+='<div class="karte pad" style="margin-top:14px"><h2 style="margin-top:0">Daten</h2><div class="knopfreihe">'
+   +'<button class="btn" id="expJson">Export JSON (Sicherung)</button>'
+   +'<button class="btn" id="impJson">Import JSON</button>'
+   +'<button class="btn" id="expCsv">Export CSV (Monat)</button>'
+   +'<button class="btn" id="druck">Drucken / PDF</button></div>'
+   +'<input type="file" id="impFile" accept="application/json,.json" style="display:none">'
+   +'<div id="impVorschau"></div><div class="trenner"></div>'
+   +'<button class="btn gefahr" id="loeschAlles">Alle Daten löschen</button>'
+   +'<p class="hint">Die Daten liegen ausschließlich in diesem Browser (localStorage, Schlüssel <code>zeiterfassung.v1</code>). Wird die Datei oder ihr Link weitergegeben, startet die App beim Empfänger mit leerem, eigenem Bestand.</p>'
+   +'<p class="hint">Gespeicherte Tage: '+Object.keys(state.tage).length+'</p></div></div>';
+
+  view.innerHTML=h;
+  einstellungenEvents();
+}
+function einstellungenEvents(){
+  var e=E();
+  var g=function(id){ return document.getElementById(id); };
+  var alle=function(sel,fn){ var xs=document.querySelectorAll(sel); for(var i=0;i<xs.length;i++) fn(xs[i]); };
+  function fertig(neuzeichnen){ speichern(); themeAnwenden(); if(neuzeichnen!==false) zeichneEinstellungen(); }
+
+  alle('input[name="waz"]',function(r){
+    r.addEventListener("change",function(){ if(r.value!=="frei") e.wochenarbeitszeit=parseInt(r.value,10); fertig(); });
+  });
+  g("wazFrei").addEventListener("change",function(){
+    var v=parseDauer(this.value); if(v!==null&&v>0&&v<=7*1440) e.wochenarbeitszeit=v; fertig();
+  });
+  alle("[data-at]",function(c){
+    c.addEventListener("change",function(){ e.arbeitstage[+c.getAttribute("data-at")]=c.checked; fertig(); });
+  });
+  g("tsAuto").addEventListener("change",function(){
+    e.tagessollAuto=this.checked;
+    if(!e.tagessollAuto) e.tagessoll=tagessollBerechnet(e);
+    fertig();
+  });
+  g("tsWert").addEventListener("change",function(){ var v=parseDauer(this.value); if(v!==null&&v>=0) e.tagessoll=v; fertig(); });
+  g("rahmenAn").addEventListener("change",function(){ e.rahmenPruefung=this.checked; fertig(false); });
+  g("rahmenVon").addEventListener("change",function(){ var v=parseZeit(this.value); if(v!==null) e.rahmenVon=fmtUhr(v); fertig(); });
+  g("rahmenBis").addEventListener("change",function(){ var v=parseZeit(this.value); if(v!==null) e.rahmenBis=fmtUhr(v); fertig(); });
+  g("kernAn").addEventListener("change",function(){ e.kernzeitPruefung=this.checked; fertig(false); });
+  alle("[data-kern]",function(el){
+    el.addEventListener("change",function(){
+      var d=+el.getAttribute("data-kern"), j=+el.getAttribute("data-j"), teil=el.getAttribute("data-teil");
+      var v=parseZeit(el.value);
+      if(v!==null) e.kernzeiten[String(d)][j][teil]=fmtUhr(v);
+      fertig();
+    });
+  });
+  alle("[data-kerndel]",function(b){
+    b.addEventListener("click",function(){ e.kernzeiten[String(b.getAttribute("data-kerndel"))].splice(+b.getAttribute("data-j"),1); fertig(); });
+  });
+  alle("[data-kernadd]",function(b){
+    b.addEventListener("click",function(){
+      var k=String(b.getAttribute("data-kernadd"));
+      if(!e.kernzeiten[k]) e.kernzeiten[k]=[];
+      e.kernzeiten[k].push({von:"08:30",bis:"12:00"}); fertig();
+    });
+  });
+  alle("[data-stufe]",function(el){
+    el.addEventListener("change",function(){
+      var i=+el.getAttribute("data-stufe"), teil=el.getAttribute("data-teil");
+      if(teil==="grenze"){ var v=parseDauer(el.value); if(v!==null&&v>=0) e.pausenstufen[i].grenze=v; }
+      else { var m=parseInt(String(el.value).replace(/[^0-9]/g,""),10); if(isFinite(m)) e.pausenstufen[i].pause=m; }
+      fertig();
+    });
+  });
+  alle("[data-stufedel]",function(b){
+    b.addEventListener("click",function(){ e.pausenstufen.splice(+b.getAttribute("data-stufedel"),1); fertig(); });
+  });
+  g("stufeAdd").addEventListener("click",function(){ e.pausenstufen.push({grenze:720,pause:60}); fertig(); });
+  g("vzAn").addEventListener("change",function(){ e.verspaetungszuschlag=this.checked; fertig(false); });
+
+  ["kappung","maxWoche","ruhezeit","kontoMinus","kontoPlus"].forEach(function(id){
+    g(id).addEventListener("change",function(){ var v=parseDauer(this.value); if(v!==null&&v>=0) e[id]=v; fertig(); });
+  });
+  g("startKonto").addEventListener("change",function(){ var v=parseDauer(this.value); if(v!==null) e.startKonto=v; fertig(); });
+  g("stichtag").addEventListener("change",function(){ e.stichtag=this.value; fertig(); });
+  g("land").addEventListener("change",function(){ e.land=this.value; fertig(); });
+  g("nameF").addEventListener("change",function(){ e.name=this.value.trim(); speichern(); });
+  alle('input[name="theme"]',function(r){ r.addEventListener("change",function(){ e.theme=r.value; fertig(); }); });
+
+  g("expJson").addEventListener("click",jsonExport);
+  g("impJson").addEventListener("click",function(){ g("impFile").click(); });
+  g("impFile").addEventListener("change",jsonImport);
+  g("expCsv").addEventListener("click",csvExport);
+  g("druck").addEventListener("click",function(){
+    ansicht.reiter="monat"; location.hash="#/info";
+    setTimeout(function(){ window.print(); },300);
+  });
+  g("loeschAlles").addEventListener("click",function(){
+    if(!window.confirm("Wirklich ALLE Buchungen und Einstellungen löschen? Das lässt sich nicht rückgängig machen.")) return;
+    if(!window.confirm("Letzte Rückfrage: Der gesamte Datenbestand wird gelöscht. Fortfahren?")) return;
+    state=leererState();
+    try{ window.localStorage.removeItem(KEY); }catch(err){}
+    speichern(); themeAnwenden(); zeichneEinstellungen();
+  });
+}
+
+/* =========================================================================
+   Export / Import
+   ========================================================================= */
+function download(name,inhalt,typ){
+  var b=new Blob([inhalt],{type:typ||"application/octet-stream"});
+  var u=URL.createObjectURL(b), a=document.createElement("a");
+  a.href=u; a.download=name; document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(u); a.parentNode.removeChild(a); },800);
+}
+function jsonExport(){
+  download("zeiterfassung-sicherung-"+heuteKey()+".json", JSON.stringify(state,null,2), "application/json");
+}
+function jsonImport(ev){
+  var f=ev.target.files&&ev.target.files[0];
+  if(!f) return;
+  var box=document.getElementById("impVorschau");
+  var leser=new FileReader();
+  leser.onload=function(){
+    var p=null;
+    try{ p=JSON.parse(leser.result); }
+    catch(err){
+      box.innerHTML='<ul class="hinweise" style="margin-top:12px"><li class="w"><span class="sym">!</span><span>Die Datei ist kein gültiges JSON.</span></li></ul>';
+      return;
+    }
+    if(!p||typeof p!=="object"||!p.tage){
+      box.innerHTML='<ul class="hinweise" style="margin-top:12px"><li class="w"><span class="sym">!</span><span>Die Datei enthält keinen Zeiterfassungs-Bestand.</span></li></ul>';
+      return;
+    }
+    var keys=Object.keys(p.tage).sort(), n=keys.length;
+    box.innerHTML='<div class="karte pad" style="margin-top:12px;background:var(--surface2)">'
+      +'<div class="label">Vorschau des Imports</div>'
+      +'<p style="margin:0 0 6px">Die Datei <strong>'+esc(f.name)+'</strong> enthält <strong>'+n+'</strong> Tage'
+      +(n?' ('+esc(fmtDatum(keys[0]))+' bis '+esc(fmtDatum(keys[n-1]))+')':'')
+      +(p.einstellungen?' und ein vollständiges Einstellungsprofil':'')+'.</p>'
+      +'<p class="hint">Der Import <strong>überschreibt</strong> den aktuellen Bestand ('+Object.keys(state.tage).length+' Tage) vollständig.</p>'
+      +'<div class="knopfreihe" style="margin-top:10px"><button class="btn prim" id="impOk">Jetzt überschreiben</button>'
+      +'<button class="btn" id="impAbbruch">Abbrechen</button></div></div>';
+    document.getElementById("impOk").addEventListener("click",function(){
+      if(!window.confirm("Aktuellen Bestand durch die Importdatei ersetzen?")) return;
+      var s=leererState();
+      s.tage=p.tage||{};
+      var std=standardEinstellungen();
+      for(var k in std) if(p.einstellungen&&p.einstellungen[k]!==undefined) std[k]=p.einstellungen[k];
+      s.einstellungen=std;
+      state=s; speichern(); themeAnwenden(); zeichneEinstellungen();
+      window.alert("Import abgeschlossen: "+n+" Tage übernommen.");
+    });
+    document.getElementById("impAbbruch").addEventListener("click",function(){ box.innerHTML=""; });
+  };
+  leser.readAsText(f);
+  ev.target.value="";
+}
+function csvExport(){
+  var b=monatsBilanz(ansicht.jahr,ansicht.monat), sep=";";
+  function q(s){ return '"'+String(s===null||s===undefined?"":s).replace(/"/g,'""')+'"'; }
+  var zeilen=[["Datum","Tag","Art","Kommen","Gehen","Pausen","Pause h","Dienstgaenge","Dienstgang h","Brutto","Abzug","gekappt","Ist","Soll","Saldo","Korrekturen","Notiz"].map(q).join(sep)];
+  b.tage.forEach(function(r){
+    var t=state.tage[r.key]||{};
+    zeilen.push([
+      q(fmtDatum(r.key)), q(WT_KURZ[r.dow]), q(r.feiertag||r.artName),
+      q(r.kommen!==null?fmtUhr(r.kommen):""), q(r.gehen!==null?fmtUhr(r.gehen):""),
+      q(r.pausen.map(function(x){return fmtUhr(x.a)+"-"+fmtUhr(x.b);}).join(" / ")), q(fmtDauer(r.gebuchtePause)),
+      q(r.dienstgaenge.map(function(x){return fmtUhr(x.a)+"-"+fmtUhr(x.b);}).join(" / ")), q(fmtDauer(r.dienstgangSumme)),
+      q(fmtDauer(r.brutto)), q(fmtDauer(r.abzug)), q(fmtDauer(r.gekappt)),
+      q(fmtDauer(r.ist)), q(fmtDauer(r.soll)), q(fmtSaldo(r.saldo)),
+      q((r.korrekturen||[]).map(function(k){return k.min+" min: "+(k.grund||"ohne Begründung");}).join(" / ")),
+      q(t.notiz||"")
+    ].join(sep));
+  });
+  zeilen.push("");
+  zeilen.push([q("Summe Monat"),q(""),q(""),q(""),q(""),q(""),q(fmtDauer(b.pause)),q(""),q(fmtDauer(b.dienstgang)),
+    q(""),q(""),q(""),q(fmtDauer(b.ist)),q(fmtDauer(b.soll)),q(fmtSaldo(b.saldo)),q(""),q("")].join(sep));
+  zeilen.push([q("Kontostand am Monatsende"),q(fmtSaldo(kontostandBis(letzterTagKey())))].join(sep));
+  download("zeiterfassung-"+ansicht.jahr+"-"+pad2(ansicht.monat+1)+".csv","﻿"+zeilen.join("\r\n"),"text/csv;charset=utf-8");
+}
+
+/* =========================================================================
+   Theme, PWA, Start
+   ========================================================================= */
+function themeAnwenden(){
+  var t=E().theme;
+  if(t==="auto") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme",t);
+  var dunkel = t==="dunkel" || (t==="auto" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  var mt=document.querySelector('meta[name="theme-color"]');
+  if(mt) mt.setAttribute("content", dunkel?"#1a1e22":"#1f4e79");
+}
+document.getElementById("themeBtn").addEventListener("click",function(){
+  var e=E();
+  var dunkelJetzt = e.theme==="dunkel" || (e.theme==="auto" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  e.theme = dunkelJetzt?"hell":"dunkel";
+  speichern(); themeAnwenden();
+  if(ansicht.seite==="einstellungen") zeichneEinstellungen();
+});
+
+function iconDataUrl(px){
+  try{
+    var c=document.createElement("canvas"); c.width=px; c.height=px;
+    var x=c.getContext("2d"); if(!x) return null;
+    var r=px*0.22;
+    x.fillStyle="#1f4e79";
+    x.beginPath();
+    if(x.roundRect) x.roundRect(0,0,px,px,r);
+    else { x.moveTo(r,0); x.arcTo(px,0,px,px,r); x.arcTo(px,px,0,px,r); x.arcTo(0,px,0,0,r); x.arcTo(0,0,px,0,r); }
+    x.closePath(); x.fill();
+    x.strokeStyle="#ffffff"; x.lineCap="round"; x.lineJoin="round"; x.lineWidth=px*0.055;
+    x.beginPath(); x.arc(px/2,px/2,px*0.29,0,Math.PI*2); x.stroke();
+    x.beginPath(); x.moveTo(px/2,px*0.30); x.lineTo(px/2,px*0.52); x.lineTo(px*0.665,px*0.60); x.stroke();
+    return c.toDataURL("image/png");
+  }catch(err){ return null; }
+}
+function pwaEinrichten(){
+  var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#1f4e79"/><circle cx="256" cy="256" r="148" fill="none" stroke="#fff" stroke-width="28"/><path d="M256 154v112l84 42" fill="none" stroke="#fff" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var svgUrl="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);
+  var icons=[{src:svgUrl,sizes:"any",type:"image/svg+xml",purpose:"any"}];
+  var png512=iconDataUrl(512);
+  if(png512) icons.push({src:png512,sizes:"512x512",type:"image/png",purpose:"any maskable"});
+  var manifest={
+    name:"Zeiterfassung", short_name:"Zeiten",
+    description:"Private Parallelaufzeichnung der Arbeitszeit",
+    start_url:".", scope:".", display:"standalone", orientation:"any",
+    background_color:"#f4f6f8", theme_color:"#1f4e79", lang:"de", icons:icons
+  };
+  try{
+    var blob=new Blob([JSON.stringify(manifest)],{type:"application/manifest+json"});
+    var l=document.createElement("link"); l.rel="manifest"; l.href=URL.createObjectURL(blob);
+    document.head.appendChild(l);
+  }catch(err){}
+  var ap=document.createElement("link"); ap.rel="apple-touch-icon"; ap.href=iconDataUrl(180)||svgUrl;
+  document.head.appendChild(ap);
+  var fav=document.createElement("link"); fav.rel="icon"; fav.type="image/svg+xml"; fav.href=svgUrl;
+  document.head.appendChild(fav);
+}
+
+laden();
+themeAnwenden();
+pwaEinrichten();
+window.addEventListener("hashchange",route);
+if(window.matchMedia){
+  var mq=window.matchMedia("(prefers-color-scheme: dark)");
+  if(mq.addEventListener) mq.addEventListener("change",themeAnwenden);
+}
+document.addEventListener("keydown",function(ev){ if(ev.key==="Escape" && detailKey) detailSchliessen(); });
+if(!location.hash) location.hash="#/stempel";
+route();
+setInterval(function(){ if(ansicht.seite==="stempel") tick(); },1000);
+
+/* Prüf-Schnittstelle für die Konsole */
+window.ZE={
+  state:function(){return state;},
+  rechne:tagRechnung,
+  monat:monatsBilanz,
+  konto:kontostandBis,
+  setze:function(k,t){ state.tage[k]=t; speichern(); },
+  neu:function(){ zeichne(); },
+  ansicht:ansicht
+};
+
+})();
+</script>
+</body>
+</html>
