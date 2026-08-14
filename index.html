@@ -12,42 +12,44 @@
 <meta name="color-scheme" content="light dark">
 <style>
 :root{
-  --bg:#f4f6f8; --surface:#ffffff; --surface2:#fafbfc; --text:#15181c; --muted:#5b6672;
-  --line:#dfe4e9; --line-stark:#c3ccd4; --akzent:#1f4e79; --akzent-weich:#e8f0f7;
-  --plus:#1c6b4b; --minus:#9c3a2c; --warn:#8a5a00; --warn-bg:#fdf6e6;
-  --bar-plus:#2f7d5c; --bar-minus:#a8503f; --fokus:#1f4e79;
-  --schatten:0 1px 2px rgba(16,24,32,.06),0 1px 8px rgba(16,24,32,.05);
-  --z-blau:#e7eff8; --z-gelb:#fbf2dd; --z-gruen:#a4e6b8; --z-rot:#ffb0a6;
-  --woche-bg:#dde9f5;
-  --kopf-bg:#1f4e79; --kopf-text:#ffffff; --kopf-weich:rgba(255,255,255,.16);
-  --tint-plus:#e8f6ee; --tint-minus:#fdecea; --tint-akzent:#eef4fa;
-  /* Vollflaechige Varianten — immer mit weisser Schrift verwendbar, in beiden Modi */
-  --akzent-voll:#1f4e79; --plus-voll:#1c7a52; --minus-voll:#a83c2c; --warn-voll:#96690f;
+  --bg:#f6f8fa; --surface:#ffffff; --surface2:#f0f3f6; --text:#1f2328; --muted:#636c76;
+  --line:#d1d9e0; --line-stark:#b7c0c9; --akzent:#0969da; --akzent-weich:#ddf4ff;
+  --plus:#1a7f37; --minus:#cf222e; --warn:#9a6700; --warn-bg:#fff8c5;
+  --bar-plus:#1a7f37; --bar-minus:#cf222e; --fokus:#0969da;
+  --akzent-voll:#0969da; --plus-voll:#1a7f37; --minus-voll:#cf222e; --warn-voll:#9a6700;
+  --schatten:0 1px 2px rgba(31,35,40,.08);
+  --kopf-bg:#161b22; --kopf-text:#ffffff; --kopf-weich:rgba(255,255,255,.12);
+  --tint-plus:#eaf6ec; --tint-minus:#fdeeee; --tint-akzent:#eaf3fc;
+  --rand-plus:#1a7f37; --rand-minus:#cf222e; --rand-warn:#9a6700; --rand-akzent:#0969da;
+  --puls:rgba(26,127,55,.45);
+  --z-gruen:#e6f4ea; --z-rot:#fdeceb; --z-gelb:#fdf6e3; --z-blau:#f2f5f8; --woche-bg:#eef2f6;
 }
 :root[data-theme="dunkel"]{
-  --bg:#111417; --surface:#1a1e22; --surface2:#20252a; --text:#e6eaee; --muted:#98a3ae;
-  --line:#2b3138; --line-stark:#3a424b; --akzent:#7fb3e0; --akzent-weich:#1c2a37;
-  --plus:#6cc79b; --minus:#e58f7d; --warn:#d9a83f; --warn-bg:#2a2413;
-  --bar-plus:#3d9a72; --bar-minus:#b8604c; --fokus:#7fb3e0;
-  --schatten:0 1px 2px rgba(0,0,0,.4);
-  --z-blau:#16222f; --z-gelb:#282213; --z-gruen:#1f6b3d; --z-rot:#7a2b21;
-    --woche-bg:#1c2c3d;
-    --kopf-bg:#152232; --kopf-text:#e9eef4; --kopf-weich:rgba(255,255,255,.10);
-    --tint-plus:#16261d; --tint-minus:#2a1b18; --tint-akzent:#1a2531;
-    --akzent-voll:#2f6ea8; --plus-voll:#2a8f63; --minus-voll:#bd4f3c; --warn-voll:#9d7418;
+  --bg:#0d1117; --surface:#161b22; --surface2:#1c222b; --text:#e6edf3; --muted:#8b949e;
+  --line:#262d36; --line-stark:#39414d; --akzent:#4493f8; --akzent-weich:#132033;
+  --plus:#3fb950; --minus:#f85149; --warn:#d29922; --warn-bg:#231c0c;
+  --bar-plus:#3fb950; --bar-minus:#f85149; --fokus:#4493f8;
+  --akzent-voll:#1f6feb; --plus-voll:#238636; --minus-voll:#b62324; --warn-voll:#9e6a03;
+  --schatten:0 1px 2px rgba(0,0,0,.5);
+  --kopf-bg:#010409; --kopf-text:#e6edf3; --kopf-weich:rgba(255,255,255,.09);
+  --tint-plus:#0f2417; --tint-minus:#2a1416; --tint-akzent:#0f1d2e;
+  --rand-plus:#238636; --rand-minus:#b62324; --rand-warn:#9e6a03; --rand-akzent:#1f6feb;
+  --puls:rgba(63,185,80,.55);
+  --z-gruen:#12291b; --z-rot:#2d1618; --z-gelb:#26200d; --z-blau:#141a22; --woche-bg:#151d28;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="hell"]){
-    --bg:#111417; --surface:#1a1e22; --surface2:#20252a; --text:#e6eaee; --muted:#98a3ae;
-    --line:#2b3138; --line-stark:#3a424b; --akzent:#7fb3e0; --akzent-weich:#1c2a37;
-    --plus:#6cc79b; --minus:#e58f7d; --warn:#d9a83f; --warn-bg:#2a2413;
-    --bar-plus:#3d9a72; --bar-minus:#b8604c; --fokus:#7fb3e0;
-    --schatten:0 1px 2px rgba(0,0,0,.4);
-    --z-blau:#16222f; --z-gelb:#282213; --z-gruen:#1f6b3d; --z-rot:#7a2b21;
-    --woche-bg:#1c2c3d;
-    --kopf-bg:#152232; --kopf-text:#e9eef4; --kopf-weich:rgba(255,255,255,.10);
-    --tint-plus:#16261d; --tint-minus:#2a1b18; --tint-akzent:#1a2531;
-    --akzent-voll:#2f6ea8; --plus-voll:#2a8f63; --minus-voll:#bd4f3c; --warn-voll:#9d7418;
+    --bg:#0d1117; --surface:#161b22; --surface2:#1c222b; --text:#e6edf3; --muted:#8b949e;
+    --line:#262d36; --line-stark:#39414d; --akzent:#4493f8; --akzent-weich:#132033;
+    --plus:#3fb950; --minus:#f85149; --warn:#d29922; --warn-bg:#231c0c;
+    --bar-plus:#3fb950; --bar-minus:#f85149; --fokus:#4493f8;
+    --akzent-voll:#1f6feb; --plus-voll:#238636; --minus-voll:#b62324; --warn-voll:#9e6a03;
+    --schatten:0 1px 2px rgba(0,0,0,.5);
+    --kopf-bg:#010409; --kopf-text:#e6edf3; --kopf-weich:rgba(255,255,255,.09);
+    --tint-plus:#0f2417; --tint-minus:#2a1416; --tint-akzent:#0f1d2e;
+    --rand-plus:#238636; --rand-minus:#b62324; --rand-warn:#9e6a03; --rand-akzent:#1f6feb;
+    --puls:rgba(63,185,80,.55);
+    --z-gruen:#12291b; --z-rot:#2d1618; --z-gelb:#26200d; --z-blau:#141a22; --woche-bg:#151d28;
   }
 }
 *{box-sizing:border-box}
@@ -301,6 +303,69 @@ input.kurz{max-width:150px}
 #druckkopf{display:none}
 .unterschrift{display:none}
 
+/* =========================================================================
+   Entwurf „Cockpit" — nur Optik, arbeitet ausschliesslich mit den Tokens oben
+   ========================================================================= */
+
+/* --- Statuskarte: die Uhr wird zum Hauptmotiv --- */
+.status{padding:24px;border-left-width:0;border:1px solid var(--line);
+  position:relative;overflow:hidden;border-radius:12px}
+.status .zeile1{align-items:center}
+.status .zustand{font-size:17px;font-weight:600;color:var(--muted);
+  display:inline-flex;align-items:center;gap:9px;text-transform:uppercase;letter-spacing:.08em}
+.status .uhr{width:100%;margin:10px 0 0;font-size:54px;font-weight:600;
+  letter-spacing:-.03em;color:var(--text)}
+.status .seit{margin-top:2px}
+@media(max-width:560px){.status .uhr{font-size:42px}}
+
+.status[data-z="arbeit"]{background:var(--tint-plus);border-color:var(--rand-plus)}
+.status[data-z="pause"]{background:var(--warn-bg);border-color:var(--rand-warn)}
+.status[data-z="dienstgang"]{background:var(--tint-akzent);border-color:var(--rand-akzent)}
+.status[data-z="arbeit"] .marker{background:var(--tint-plus);border:1px solid var(--rand-plus);color:var(--plus)}
+.status[data-z="pause"] .marker{background:var(--warn-bg);border:1px solid var(--rand-warn);color:var(--warn)}
+.status[data-z="dienstgang"] .marker{background:var(--tint-akzent);border:1px solid var(--rand-akzent);color:var(--akzent)}
+
+/* Pulspunkt, nur solange Arbeitszeit oder Dienstgang laeuft */
+.status .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;display:none;
+  background:var(--plus);animation:puls 2s infinite}
+.status[data-z="arbeit"] .dot,.status[data-z="dienstgang"] .dot{display:inline-block}
+.status[data-z="dienstgang"] .dot{background:var(--akzent)}
+@keyframes puls{
+  0%{box-shadow:0 0 0 0 var(--puls)}
+  70%{box-shadow:0 0 0 9px rgba(0,0,0,0)}
+  100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}
+}
+
+/* --- Buchungstasten: farbiger Rand statt Vollton --- */
+.taste{min-height:80px;border-radius:12px;background:var(--surface);
+  border:1.5px solid var(--line-stark);box-shadow:none!important}
+.taste svg{width:24px;height:24px}
+.taste.kommen:not([disabled]){background:var(--tint-plus);color:var(--plus);border-color:var(--rand-plus)}
+.taste.gehen:not([disabled]){background:var(--tint-minus);color:var(--minus);border-color:var(--rand-minus)}
+.taste.pause:not([disabled]){background:var(--warn-bg);color:var(--warn);border-color:var(--rand-warn)}
+.taste.dienstgang:not([disabled]){background:var(--tint-akzent);color:var(--akzent);border-color:var(--rand-akzent)}
+.taste[disabled]{background:var(--surface2);color:var(--muted);border-color:var(--line);opacity:1;box-shadow:none}
+
+/* --- Kennzahlen --- */
+.label{color:var(--akzent);letter-spacing:.1em}
+.konto .gross{font-size:46px;font-weight:650}
+.heute{border-radius:10px}
+.heute > div{padding:14px 16px}
+.heute .v{font-size:20px}
+.gross-link{border-radius:12px;background:var(--surface);
+  border-color:var(--line-stark);box-shadow:none}
+
+/* --- Tabelle: Status als Kantenmarke, Flaechen bleiben ruhig --- */
+.tabwrap{border-radius:10px}
+table.monat th{background:var(--kopf-bg);color:var(--muted)}
+table.monat td{height:40px}
+table.monat tr.z-gruen td:nth-child(1){box-shadow:inset 3px 0 0 var(--plus)}
+table.monat tr.z-rot td:nth-child(1){box-shadow:inset 3px 0 0 var(--minus)}
+table.monat tr.z-gelb td:nth-child(1){box-shadow:inset 3px 0 0 var(--warn)}
+table.monat tr.z-blau td:nth-child(1){box-shadow:inset 3px 0 0 var(--line-stark)}
+table.monat tr.wochenzeile td{border-top:1.5px solid var(--akzent);
+  border-bottom:1.5px solid var(--akzent);color:var(--text)}
+
 @media print{
   @page{size:A4 landscape;margin:11mm}
   body{background:#fff;color:#000;font-size:10pt}
@@ -319,6 +384,10 @@ input.kurz{max-width:150px}
   table.monat th:nth-child(1),table.monat th:nth-child(2){position:static;box-shadow:none;background:#eee}
   table.monat td:nth-child(1),table.monat td:nth-child(2){position:static;box-shadow:none;background:none}
   table.monat tr.tag-heute td:nth-child(1){box-shadow:none}
+  /* Die Kantenmarken des Cockpit-Entwurfs sind spezifischer als die Ruecksetzregel oben
+     und wuerden sonst im Ausdruck erscheinen — das Druckblatt bleibt unveraendert. */
+  table.monat tr.z-gruen td:nth-child(1),table.monat tr.z-rot td:nth-child(1),
+  table.monat tr.z-gelb td:nth-child(1),table.monat tr.z-blau td:nth-child(1){box-shadow:none}
   table.monat tr.z-blau td{background:#eaf0f7}
   table.monat tr.z-gelb td{background:#faf3e1}
   table.monat tr.z-gruen td{background:#a4e6b8}
@@ -554,7 +623,7 @@ function standardEinstellungen(){
     stichtag: "",
     land: "RP",
     name: "",
-    theme: "auto"
+    theme: "dunkel"   /* Startwert fuer neue Nutzer; gespeicherte Einstellungen bleiben unberuehrt */
   };
 }
 function tagessollBerechnet(e){
@@ -1127,7 +1196,7 @@ function tick(){
     seitTxt="Seit der letzten Buchung ("+fmtUhr(letzte)+"): "+Math.floor(sek/3600)+":"+pad2(Math.floor((sek%3600)/60))+":"+pad2(sek%60);
   }
   sk.setAttribute("data-z",z);
-  sk.innerHTML='<div class="zeile1"><span class="zustand">'+esc(zustand)+'</span>'
+  sk.innerHTML='<div class="zeile1"><span class="zustand"><i class="dot"></i>'+esc(zustand)+'</span>'
     +'<span class="marker">'+(z===""?"aus":z==="arbeit"?"läuft":z==="pause"?"Pause":"unterwegs")+'</span>'
     +'<span class="uhr">'+pad2(now.getHours())+":"+pad2(now.getMinutes())+":"+pad2(now.getSeconds())+'</span></div>'
     +'<div class="seit">'+esc(seitTxt)+'</div>';
@@ -1939,7 +2008,7 @@ function themeAnwenden(){
   else document.documentElement.setAttribute("data-theme",t);
   var dunkel = t==="dunkel" || (t==="auto" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
   var mt=document.querySelector('meta[name="theme-color"]');
-  if(mt) mt.setAttribute("content", dunkel?"#1a1e22":"#1f4e79");
+  if(mt) mt.setAttribute("content", dunkel?"#010409":"#161b22");
 }
 document.getElementById("themeBtn").addEventListener("click",function(){
   var e=E();
@@ -1954,7 +2023,7 @@ function iconDataUrl(px){
     var c=document.createElement("canvas"); c.width=px; c.height=px;
     var x=c.getContext("2d"); if(!x) return null;
     var r=px*0.22;
-    x.fillStyle="#1f4e79";
+    x.fillStyle="#1f6feb";
     x.beginPath();
     if(x.roundRect) x.roundRect(0,0,px,px,r);
     else { x.moveTo(r,0); x.arcTo(px,0,px,px,r); x.arcTo(px,px,0,px,r); x.arcTo(0,px,0,0,r); x.arcTo(0,0,px,0,r); }
