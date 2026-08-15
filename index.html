@@ -4,54 +4,80 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Zeiterfassung</title>
-<meta name="theme-color" content="#1f4e79">
+<meta name="theme-color" content="#070b13">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Zeiterfassung">
 <meta name="color-scheme" content="light dark">
 <style>
+/* =========================================================================
+   Design „Aurora" — komplette Optik-Schicht.
+   Der Rechenkern und die Druckausgabe bleiben unverändert.
+   ========================================================================= */
+
+/* ---- Farbwelt (hell) ---- */
 :root{
-  --bg:#f6f8fa; --surface:#ffffff; --surface2:#f0f3f6; --text:#1f2328; --muted:#636c76;
-  --line:#d1d9e0; --line-stark:#b7c0c9; --akzent:#0969da; --akzent-weich:#ddf4ff;
-  --plus:#1a7f37; --minus:#cf222e; --warn:#9a6700; --warn-bg:#fff8c5;
-  --bar-plus:#1a7f37; --bar-minus:#cf222e; --fokus:#0969da;
-  --akzent-voll:#0969da; --plus-voll:#1a7f37; --minus-voll:#cf222e; --warn-voll:#9a6700;
-  --schatten:0 1px 2px rgba(31,35,40,.08);
-  --kopf-bg:#161b22; --kopf-text:#ffffff; --kopf-weich:rgba(255,255,255,.12);
-  --tint-plus:#eaf6ec; --tint-minus:#fdeeee; --tint-akzent:#eaf3fc;
-  --rand-plus:#1a7f37; --rand-minus:#cf222e; --rand-warn:#9a6700; --rand-akzent:#0969da;
-  --puls:rgba(26,127,55,.45);
-  --z-gruen:#e6f4ea; --z-rot:#fdeceb; --z-gelb:#fdf6e3; --z-blau:#f2f5f8; --woche-bg:#eef2f6;
+  --bg:#eef1f7; --surface:#ffffff; --surface2:#f2f5fa; --text:#141c2b; --muted:#5d6b81;
+  --line:#dfe5ef; --line-stark:#c2cddd;
+  --akzent:#4f6ef7; --akzent-weich:#e8edff;
+  --grad-a:#4f6ef7; --grad-b:#18b6d4;
+  /* Verlauf fuer Flaechen MIT weissem Text — beide Enden >= 4,5:1 (WCAG AA) */
+  --gtxt-a:#4f46e5; --gtxt-b:#0e7490;
+  --marker-plus:#0b6b4a; --marker-akzent:#3451c9;
+  --plus:#0d9668; --minus:#e11d48; --warn:#b45309; --warn-bg:#fdf3d8;
+  --bar-plus:#0d9668; --bar-minus:#e11d48; --fokus:#4f6ef7;
+  --akzent-voll:#4f6ef7; --plus-voll:#0d9668; --minus-voll:#e11d48; --warn-voll:#d97706;
+  --schatten:0 8px 24px rgba(20,30,55,.07),0 2px 6px rgba(20,30,55,.05);
+  --kopf-bg:#16203a; --kopf-text:#ffffff;
+  --tint-plus:#e2f7ee; --tint-minus:#fde7ec; --tint-akzent:#e8f1ff;
+  --rand-plus:#0d9668; --rand-minus:#e11d48; --rand-warn:#d97706; --rand-akzent:#4f6ef7;
+  --puls:rgba(13,150,104,.4);
+  --z-gruen:#d3f3e0; --z-rot:#fcdfdd; --z-gelb:#faf0d0; --z-blau:#e9edf4; --woche-bg:#e5ebf6;
+  --glas:rgba(255,255,255,.72);
+  --aur-op:.32;
 }
+/* ---- Farbwelt (dunkel) ---- */
 :root[data-theme="dunkel"]{
-  --bg:#0d1117; --surface:#161b22; --surface2:#1c222b; --text:#e6edf3; --muted:#8b949e;
-  --line:#262d36; --line-stark:#39414d; --akzent:#4493f8; --akzent-weich:#132033;
-  --plus:#3fb950; --minus:#f85149; --warn:#d29922; --warn-bg:#231c0c;
-  --bar-plus:#3fb950; --bar-minus:#f85149; --fokus:#4493f8;
-  --akzent-voll:#1f6feb; --plus-voll:#238636; --minus-voll:#b62324; --warn-voll:#9e6a03;
-  --schatten:0 1px 2px rgba(0,0,0,.5);
-  --kopf-bg:#010409; --kopf-text:#e6edf3; --kopf-weich:rgba(255,255,255,.09);
-  --tint-plus:#0f2417; --tint-minus:#2a1416; --tint-akzent:#0f1d2e;
-  --rand-plus:#238636; --rand-minus:#b62324; --rand-warn:#9e6a03; --rand-akzent:#1f6feb;
-  --puls:rgba(63,185,80,.55);
-  --z-gruen:#12291b; --z-rot:#2d1618; --z-gelb:#26200d; --z-blau:#141a22; --woche-bg:#151d28;
+  --bg:#070b13; --surface:#0f1624; --surface2:#161f30; --text:#e8edf6; --muted:#8593a9;
+  --line:#1d2739; --line-stark:#2d3b54;
+  --akzent:#7c9aff; --akzent-weich:#182449;
+  --grad-a:#6d8bff; --grad-b:#22d3ee;
+  --marker-plus:#34d399; --marker-akzent:#7c9aff;
+  --plus:#34d399; --minus:#fb7185; --warn:#fbbf24; --warn-bg:#2b2210;
+  --bar-plus:#34d399; --bar-minus:#fb7185; --fokus:#7c9aff;
+  --akzent-voll:#5b7bff; --plus-voll:#10b981; --minus-voll:#e11d48; --warn-voll:#d97706;
+  --schatten:0 10px 30px rgba(0,0,0,.45);
+  --kopf-bg:#0a101c; --kopf-text:#e8edf6;
+  --tint-plus:#0c2b20; --tint-minus:#32151d; --tint-akzent:#12203c;
+  --rand-plus:#10b981; --rand-minus:#e11d48; --rand-warn:#d97706; --rand-akzent:#5b7bff;
+  --puls:rgba(52,211,153,.5);
+  --z-gruen:#0e3323; --z-rot:#3c1a20; --z-gelb:#312811; --z-blau:#101828; --woche-bg:#141f33;
+  --glas:rgba(9,14,25,.72);
+  --aur-op:.2;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="hell"]){
-    --bg:#0d1117; --surface:#161b22; --surface2:#1c222b; --text:#e6edf3; --muted:#8b949e;
-    --line:#262d36; --line-stark:#39414d; --akzent:#4493f8; --akzent-weich:#132033;
-    --plus:#3fb950; --minus:#f85149; --warn:#d29922; --warn-bg:#231c0c;
-    --bar-plus:#3fb950; --bar-minus:#f85149; --fokus:#4493f8;
-    --akzent-voll:#1f6feb; --plus-voll:#238636; --minus-voll:#b62324; --warn-voll:#9e6a03;
-    --schatten:0 1px 2px rgba(0,0,0,.5);
-    --kopf-bg:#010409; --kopf-text:#e6edf3; --kopf-weich:rgba(255,255,255,.09);
-    --tint-plus:#0f2417; --tint-minus:#2a1416; --tint-akzent:#0f1d2e;
-    --rand-plus:#238636; --rand-minus:#b62324; --rand-warn:#9e6a03; --rand-akzent:#1f6feb;
-    --puls:rgba(63,185,80,.55);
-    --z-gruen:#12291b; --z-rot:#2d1618; --z-gelb:#26200d; --z-blau:#141a22; --woche-bg:#151d28;
+    --bg:#070b13; --surface:#0f1624; --surface2:#161f30; --text:#e8edf6; --muted:#8593a9;
+    --line:#1d2739; --line-stark:#2d3b54;
+    --akzent:#7c9aff; --akzent-weich:#182449;
+    --grad-a:#6d8bff; --grad-b:#22d3ee;
+    --marker-plus:#34d399; --marker-akzent:#7c9aff;
+    --plus:#34d399; --minus:#fb7185; --warn:#fbbf24; --warn-bg:#2b2210;
+    --bar-plus:#34d399; --bar-minus:#fb7185; --fokus:#7c9aff;
+    --akzent-voll:#5b7bff; --plus-voll:#10b981; --minus-voll:#e11d48; --warn-voll:#d97706;
+    --schatten:0 10px 30px rgba(0,0,0,.45);
+    --kopf-bg:#0a101c; --kopf-text:#e8edf6;
+    --tint-plus:#0c2b20; --tint-minus:#32151d; --tint-akzent:#12203c;
+    --rand-plus:#10b981; --rand-minus:#e11d48; --rand-warn:#d97706; --rand-akzent:#5b7bff;
+    --puls:rgba(52,211,153,.5);
+    --z-gruen:#0e3323; --z-rot:#3c1a20; --z-gelb:#312811; --z-blau:#101828; --woche-bg:#141f33;
+    --glas:rgba(9,14,25,.72);
+    --aur-op:.2;
   }
 }
+
+/* ---- Grundgerüst ---- */
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{
@@ -62,124 +88,296 @@ body{
 }
 button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--fokus);outline-offset:2px}
+::selection{background:var(--akzent-weich)}
 
-.topbar{position:sticky;top:0;z-index:30;background:var(--kopf-bg);color:var(--kopf-text);border-bottom:1px solid rgba(0,0,0,.18);padding:env(safe-area-inset-top) 0 0 0;box-shadow:0 1px 6px rgba(16,24,32,.18)}
-.topbar-in{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:8px 14px;min-height:52px}
-.marke{font-weight:650;letter-spacing:.01em;font-size:15px;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
-.marke span{color:rgba(255,255,255,.62);font-weight:400}
-.nav{margin-left:auto;display:flex;gap:6px;align-items:center;flex:0 0 auto}
-.nav a{color:rgba(255,255,255,.80)}
-.nav a:hover{background:var(--kopf-weich);color:#fff}
-.nav a.aktiv{background:#fff;color:var(--kopf-bg);border-color:transparent;font-weight:650}
-.topbar .iconbtn{background:var(--kopf-weich);border-color:transparent;color:rgba(255,255,255,.85)}
-.topbar .iconbtn:hover{background:rgba(255,255,255,.28);color:#fff}
-.topbar a.iconbtn.aktiv{background:#fff;color:var(--kopf-bg)}
-@media(max-width:560px){
-  .topbar-in{gap:8px;padding:8px 10px}
-  .marke{font-size:14px}
-  .marke span{display:none}
-  .nav{gap:4px}
-  .nav a{padding:0 10px;font-size:13.5px}
-  .iconbtn{min-width:36px;padding:0 7px}
-  main{padding:14px 10px 56px}
+/* ---- Aurora-Hintergrund: drei weiche Farbfelder, die langsam treiben ---- */
+.aurora{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.aurora i{position:absolute;width:72vmax;height:72vmax;border-radius:50%;opacity:var(--aur-op)}
+.aurora .a1{background:radial-gradient(circle,var(--grad-a) 0%,transparent 62%);top:-32vmax;left:-22vmax;animation:drift1 26s ease-in-out infinite alternate}
+.aurora .a2{background:radial-gradient(circle,var(--grad-b) 0%,transparent 62%);bottom:-34vmax;right:-26vmax;animation:drift2 34s ease-in-out infinite alternate}
+.aurora .a3{background:radial-gradient(circle,#a855f7 0%,transparent 62%);top:30%;right:-40vmax;width:56vmax;height:56vmax;animation:drift3 30s ease-in-out infinite alternate}
+@keyframes drift1{to{transform:translate(9vmax,7vmax) scale(1.12)}}
+@keyframes drift2{to{transform:translate(-8vmax,-6vmax) scale(1.18)}}
+@keyframes drift3{to{transform:translate(-10vmax,8vmax)}}
+@media (prefers-reduced-motion:reduce){.aurora i{animation:none}}
+
+/* ---- Scroll-Reveal: Abschnitte fliegen beim Scrollen weich ins Bild ---- */
+.reveal{opacity:0;transform:translateY(26px) scale(.985);
+  transition:opacity .65s cubic-bezier(.2,.7,.2,1) var(--d,0ms),transform .65s cubic-bezier(.2,.7,.2,1) var(--d,0ms)}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+
+/* ---- Buehne: die Stempeluhr fuellt den Schirm, darunter rollen die Karten herein ---- */
+.hero{min-height:calc(100vh - 170px);min-height:calc(100svh - 170px);
+  display:flex;flex-direction:column;justify-content:center;gap:16px;position:relative;padding-bottom:46px}
+@media(max-width:719px){.hero{min-height:calc(100vh - 240px);min-height:calc(100svh - 240px)}}
+.rollin{opacity:.001;transform-origin:50% 100%;will-change:transform,opacity}
+.eng > .rollin{margin-top:16vh}
+.eng > .rollin:last-child{margin-bottom:12vh}
+@media (prefers-reduced-motion:reduce){.rollin{opacity:1!important;transform:none!important}}
+.scrollhint{position:absolute;left:50%;bottom:4px;transform:translateX(-50%);width:40px;height:40px;border-radius:50%;
+  border:1px solid var(--line);background:var(--surface);display:flex;align-items:center;justify-content:center;
+  color:var(--muted);box-shadow:var(--schatten);transition:opacity .45s ease;pointer-events:none}
+.scrollhint svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+@media (prefers-reduced-motion:no-preference){
+  .scrollhint{animation:huepf 2.3s ease-in-out infinite}
+  @keyframes huepf{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,8px)}}
 }
-.nav a{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 14px;border-radius:8px;text-decoration:none;color:var(--muted);font-size:14px;font-weight:550;border:1px solid transparent}
-.nav a:hover{background:var(--surface2);color:var(--text)}
-.nav a.aktiv{background:var(--akzent-weich);color:var(--akzent);border-color:var(--line)}
-.iconbtn{min-width:38px;min-height:38px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0 9px;color:var(--muted)}
-.iconbtn:hover{background:var(--surface2);color:var(--text)}
-main{max-width:1400px;margin:0 auto;padding:16px 14px 64px}
-.eng{max-width:760px}
-h1{font-size:20px;margin:0 0 4px;font-weight:650;letter-spacing:-.01em}
-h2{font-size:14px;margin:26px 0 10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
-h3{font-size:15px;margin:18px 0 8px;font-weight:650}
+
+/* ---- Topbar (Glas) ---- */
+.topbar{position:sticky;top:0;z-index:30;background:var(--glas);
+  -webkit-backdrop-filter:saturate(1.5) blur(16px);backdrop-filter:saturate(1.5) blur(16px);
+  border-bottom:1px solid var(--line);padding:env(safe-area-inset-top) 0 0 0}
+.topbar-in{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:8px 16px;min-height:56px}
+.marke{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--text);font-weight:750;letter-spacing:-.01em;font-size:15.5px;min-width:0}
+.logo{width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,var(--gtxt-a),var(--gtxt-b));
+  display:flex;align-items:center;justify-content:center;flex:0 0 auto;box-shadow:0 3px 10px rgba(79,110,247,.4)}
+.logo svg{width:17px;height:17px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.nav{margin-left:auto;display:flex;gap:4px;background:var(--surface2);border:1px solid var(--line);padding:3px;border-radius:999px}
+.nav a{display:inline-flex;align-items:center;min-height:34px;padding:0 15px;border-radius:999px;text-decoration:none;
+  color:var(--muted);font-size:13.5px;font-weight:650;transition:color .2s,background .2s}
+.nav a:hover{color:var(--text)}
+.nav a.aktiv{background:linear-gradient(135deg,var(--gtxt-a),var(--gtxt-b));color:#fff;box-shadow:0 2px 10px rgba(79,110,247,.4)}
+.iconbtn{min-width:38px;min-height:38px;border-radius:12px;border:1px solid var(--line);background:var(--surface);
+  cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0 9px;color:var(--muted);transition:color .2s,border-color .2s,transform .3s}
+.iconbtn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.iconbtn:hover{color:var(--akzent);border-color:var(--akzent)}
+.iconbtn:active{transform:rotate(-30deg)}
+.iconbtn.aktiv{background:var(--akzent-weich);color:var(--akzent);border-color:var(--akzent)}
+
+/* ---- Bottom-Navigation (nur schmale Schirme) ---- */
+.bottomnav{display:none}
+@media(max-width:719px){
+  .nav{display:none}
+  .bottomnav{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:35;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:6px;
+    background:var(--glas);-webkit-backdrop-filter:saturate(1.5) blur(18px);backdrop-filter:saturate(1.5) blur(18px);
+    border:1px solid var(--line);border-radius:24px;box-shadow:0 14px 36px rgba(0,0,0,.28)}
+  .bottomnav a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:18px;
+    text-decoration:none;color:var(--muted);font-size:10.5px;font-weight:700;letter-spacing:.01em;transition:color .2s,background .2s}
+  .bottomnav a svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .bottomnav a.aktiv{color:#fff;background:linear-gradient(135deg,var(--gtxt-a),var(--gtxt-b));box-shadow:0 4px 14px rgba(79,110,247,.45)}
+  main{padding-bottom:calc(118px + env(safe-area-inset-bottom))}
+}
+
+main{max-width:1400px;margin:0 auto;padding:20px 16px 72px}
+.eng{max-width:720px;margin:0 auto}
+.eng > * + *{margin-top:16px}
+
+h1{font-size:clamp(24px,6vw,30px);margin:0;font-weight:800;letter-spacing:-.02em}
+.gruss h1{background:linear-gradient(115deg,var(--text) 40%,var(--akzent));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.gruss{margin-bottom:2px}
+h2{font-size:13px;margin:24px 0 10px;font-weight:750;text-transform:uppercase;letter-spacing:.07em;color:var(--akzent)}
+h3{font-size:15px;margin:20px 0 8px;font-weight:700}
 p.hint{color:var(--muted);font-size:13px;margin:4px 0 0}
-code{background:var(--surface2);border:1px solid var(--line);border-radius:4px;padding:1px 4px;font-size:12.5px}
+code{background:var(--surface2);border:1px solid var(--line);border-radius:5px;padding:1px 4px;font-size:12.5px}
 
-.karte{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--schatten)}
-.pad{padding:16px}
+.karte{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--schatten)}
+.pad{padding:18px}
 
-#banner{display:none;margin:0;padding:10px 14px;background:var(--warn-bg);color:var(--warn);border-bottom:1px solid var(--line);font-size:13.5px;font-weight:550}
+#banner{display:none;margin:0;padding:10px 16px;background:var(--warn-bg);color:var(--warn);border-bottom:1px solid var(--line);font-size:13.5px;font-weight:600}
 #banner.an{display:block}
 
-.status{padding:18px;display:flex;flex-direction:column;gap:2px;border-left:5px solid var(--line-stark);border-radius:12px}
-.status[data-z="arbeit"]{border-left-color:var(--plus-voll);background:var(--tint-plus)}
-.status[data-z="pause"]{border-left-color:var(--warn-voll);background:var(--z-gelb)}
-.status[data-z="dienstgang"]{border-left-color:var(--akzent-voll);background:var(--tint-akzent)}
-.status[data-z="arbeit"] .marker{background:var(--plus-voll);border-color:transparent;color:#fff}
-.status[data-z="pause"] .marker{background:var(--warn-voll);border-color:transparent;color:#fff}
-.status[data-z="dienstgang"] .marker{background:var(--akzent-voll);border-color:transparent;color:#fff}
-.status .zeile1{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.status .zustand{font-size:23px;font-weight:650;letter-spacing:-.01em}
-.status .marker{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);color:var(--muted)}
-.status .seit{color:var(--muted);font-size:14px;margin-top:6px}
-.status .uhr{margin-left:auto;font-size:26px;font-weight:600;letter-spacing:-.01em}
+/* ---- Statuskarte: Uhr als Hauptmotiv + Fortschrittsring ---- */
+.status{padding:22px;border:1px solid var(--line);position:relative;overflow:hidden;border-radius:20px;
+  display:flex;flex-wrap:wrap;align-items:center;gap:16px;
+  transition:background .6s ease,border-color .6s ease}
+.s-links{flex:1 1 220px;min-width:0}
+.status .zeile1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.status .zustand{font-size:13px;font-weight:700;color:var(--muted);display:inline-flex;align-items:center;gap:8px;
+  text-transform:uppercase;letter-spacing:.09em}
+.status .marker{font-size:11px;font-weight:750;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;
+  border-radius:999px;background:var(--surface2);border:1px solid var(--line);color:var(--muted)}
+.status .uhr{font-family:ui-rounded,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:clamp(48px,13vw,76px);font-weight:750;letter-spacing:-.03em;line-height:1.05;margin-top:10px;
+  font-variant-numeric:tabular-nums}
+.status .seit{color:var(--muted);font-size:13px;margin-top:6px}
+.status[data-z="arbeit"]{background:var(--tint-plus);border-color:var(--rand-plus)}
+.status[data-z="pause"]{background:var(--warn-bg);border-color:var(--rand-warn)}
+.status[data-z="dienstgang"]{background:var(--tint-akzent);border-color:var(--rand-akzent)}
+.status[data-z="arbeit"] .marker{background:var(--tint-plus);border-color:var(--rand-plus);color:var(--marker-plus)}
+.status[data-z="pause"] .marker{background:var(--warn-bg);border-color:var(--rand-warn);color:var(--warn)}
+.status[data-z="dienstgang"] .marker{background:var(--tint-akzent);border-color:var(--rand-akzent);color:var(--marker-akzent)}
+.status[data-z="arbeit"] .uhr{text-shadow:0 0 26px var(--puls)}
+@media (prefers-reduced-motion:no-preference){
+  .status[data-z="arbeit"]{animation:atmen 4.5s ease-in-out infinite}
+  @keyframes atmen{0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}50%{box-shadow:0 0 34px -6px var(--puls)}}
+}
+.status .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;display:none;background:var(--plus);animation:puls 2s infinite}
+.status[data-z="arbeit"] .dot,.status[data-z="dienstgang"] .dot{display:inline-block}
+.status[data-z="dienstgang"] .dot{background:var(--akzent)}
+@keyframes puls{0%{box-shadow:0 0 0 0 var(--puls)}70%{box-shadow:0 0 0 9px rgba(0,0,0,0)}100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}}
+@media (prefers-reduced-motion:reduce){
+  .status .dot{animation:none}
+  .taste.blitz{animation:none}
+  table.monat tr.blink td:nth-child(n+3){animation:none}
+}
 
-.tasten{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-.taste{min-height:78px;border-radius:12px;border:1px solid var(--line-stark);background:var(--surface);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-weight:650;font-size:14.5px;letter-spacing:.03em;box-shadow:var(--schatten);transition:transform .08s ease,background .12s ease}
-.taste:active{transform:scale(.985)}
-.taste svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.taste[disabled]{opacity:.36;cursor:not-allowed;box-shadow:none}
-.taste.kommen:not([disabled]){background:var(--plus-voll);border-color:transparent;color:#fff}
-.taste.gehen:not([disabled]){background:var(--minus-voll);border-color:transparent;color:#fff}
-.taste.pause:not([disabled]){background:var(--warn-voll);border-color:transparent;color:#fff}
-.taste.dienstgang:not([disabled]){background:var(--akzent-voll);border-color:transparent;color:#fff}
-.taste:not([disabled]){box-shadow:0 2px 6px rgba(16,24,32,.20)}
-.taste[disabled]{background:var(--surface2);color:var(--muted)}
+/* Fortschrittsring: Tages-Ist im Verhältnis zum Soll */
+.s-ring{position:relative;width:132px;height:132px;flex:0 0 auto;margin-left:auto}
+.s-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--line);stroke-width:10}
+.ring-fill{fill:none;stroke:url(#ringGrad);stroke-width:10;stroke-linecap:round;
+  stroke-dasharray:326.7;stroke-dashoffset:326.7;transition:stroke-dashoffset .9s cubic-bezier(.22,.8,.25,1)}
+.ring-fill.voll{stroke:var(--plus)}
+#ringGrad stop:first-child{stop-color:var(--grad-a)}
+#ringGrad stop:last-child{stop-color:var(--grad-b)}
+.ring-mitte{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.ring-pct{font-size:26px;font-weight:800;letter-spacing:-.02em}
+.ring-sub{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:700;text-align:center;max-width:80px}
+@media(max-width:560px){.s-ring{width:106px;height:106px}.ring-pct{font-size:21px}}
+
+/* ---- Buchungstasten: kräftige Farbflächen = eindeutig anklickbar ---- */
+.tasten{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.taste{position:relative;min-height:92px;border-radius:18px;border:1px solid var(--line);background:var(--surface);
+  cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  color:#fff;box-shadow:var(--schatten);overflow:hidden;
+  transition:transform .16s ease,box-shadow .2s ease,opacity .2s ease}
+.taste svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;margin-bottom:3px}
+.taste .tl{font-weight:750;font-size:16.5px;letter-spacing:.02em}
+
+.taste:not([disabled]):hover{transform:translateY(-2px)}
+.taste:not([disabled]):active{transform:scale(.96)}
+.taste.kommen:not([disabled]){background:linear-gradient(140deg,#047857,#04835f);border-color:transparent;box-shadow:0 8px 22px rgba(16,185,129,.35)}
+.taste.gehen:not([disabled]){background:linear-gradient(140deg,#be123c,#d31745);border-color:transparent;box-shadow:0 8px 22px rgba(225,29,72,.32)}
+.taste.pause:not([disabled]){background:linear-gradient(140deg,#92400e,#b45309);border-color:transparent;box-shadow:0 8px 22px rgba(217,119,6,.32)}
+.taste.dienstgang:not([disabled]){background:linear-gradient(140deg,var(--gtxt-a),var(--gtxt-b));border-color:transparent;box-shadow:0 8px 22px rgba(79,110,247,.35)}
+.taste[disabled]{background:var(--surface2);color:var(--muted);border:1.5px dashed var(--line-stark);cursor:not-allowed;box-shadow:none}
 .taste.blitz{animation:blitz .5s ease}
 @keyframes blitz{0%{box-shadow:inset 0 0 0 120px rgba(255,255,255,.45)}100%{box-shadow:inset 0 0 0 120px rgba(255,255,255,0)}}
 
-#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--surface);border:1px solid var(--line-stark);border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.18);padding:10px 12px;display:none;align-items:center;gap:12px;z-index:60;max-width:calc(100vw - 28px);font-size:14px}
-#toast.an{display:flex}
-#toast button{border:1px solid var(--line-stark);background:var(--surface2);border-radius:8px;padding:7px 11px;cursor:pointer;font-weight:600;font-size:13px;white-space:nowrap}
+/* ---- Toast ---- */
+#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));z-index:60;
+  transform:translate(-50%,16px);opacity:0;pointer-events:none;
+  background:var(--glas);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border:1px solid var(--line-stark);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);
+  padding:11px 14px;display:flex;align-items:center;gap:12px;max-width:calc(100vw - 28px);font-size:14px;font-weight:550;
+  transition:opacity .3s ease,transform .3s cubic-bezier(.2,.7,.2,1)}
+#toast.an{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+@media(max-width:719px){#toast{bottom:calc(96px + env(safe-area-inset-bottom))}}
+#toast button{border:1px solid var(--line-stark);background:var(--surface);border-radius:9px;padding:7px 12px;cursor:pointer;font-weight:700;font-size:13px;white-space:nowrap;color:var(--akzent)}
 
+/* ---- Stundenkonto ---- */
 .konto{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
-.konto .gross{font-size:40px;font-weight:680;letter-spacing:-.02em;line-height:1.05}
+.konto .gross{font-family:ui-rounded,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:46px;font-weight:800;letter-spacing:-.03em;line-height:1.05}
 .konto .gross.p{color:var(--plus)} .konto .gross.m{color:var(--minus)}
-.konto .neben{color:var(--muted);font-size:14px;padding-bottom:6px}
-.label{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--akzent);margin-bottom:6px}
-h2{color:var(--akzent)}
+.konto .neben{color:var(--muted);font-size:14px;padding-bottom:7px}
+.label{font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--akzent);margin-bottom:8px}
 
-.heute{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:1px;background:var(--line);border-radius:10px;overflow:hidden;border:1px solid var(--line)}
-.heute > div{background:var(--surface);padding:12px 14px}
-.heute .k{font-size:11.5px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;font-weight:650;min-height:32px}
-.heute .v{font-size:19px;font-weight:640;margin-top:3px}
+/* Mini-Verlauf: Tagessalden der letzten 14 Tage */
+.spark{display:flex;gap:4px;align-items:stretch;height:64px;margin-top:14px;position:relative;padding:0 2px}
+.spark::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--line-stark)}
+.sp-t{flex:1;position:relative;border-radius:5px;min-width:0}
+.sp-t:hover{background:var(--surface2)}
+.sp-t i{position:absolute;left:22%;right:22%;border-radius:3px;min-height:3px}
+.sp-t i.oben{bottom:50%}
+.sp-t i.unten{top:50%}
+.sp-t i.p{background:var(--plus)} .sp-t i.m{background:var(--minus)} .sp-t i.w{background:var(--line-stark)}
+.spark-label{font-size:11.5px;color:var(--muted);margin-top:6px}
 
-.aktionen{display:flex;gap:10px;margin-top:14px}
-.aktionen a.gross-link{flex:1;min-height:56px;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;border-radius:12px;border:1px solid var(--line-stark);background:var(--surface);color:var(--text);font-weight:650;letter-spacing:.03em;box-shadow:var(--schatten)}
+/* ---- „Heute"-Kacheln ---- */
+.heute{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.heute > div{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.heute .k{font-size:10.5px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;font-weight:750}
+.heute .v{font-size:20px;font-weight:750;margin-top:4px}
 
-.hinweise{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
-.hinweise li{display:flex;gap:9px;align-items:flex-start;font-size:13.5px;padding:8px 10px;border-radius:8px;background:var(--surface2);border:1px solid var(--line)}
-.hinweise li .sym{font-weight:800;font-size:12px;line-height:1.5;flex:0 0 auto;width:16px;text-align:center}
-.hinweise li.w{background:var(--warn-bg);border-color:var(--warn)}
-.hinweise li.w .sym{color:var(--warn)}
-.hinweise li.i .sym{color:var(--muted)}
-.hinweise li button{margin-left:auto;background:none;border:none;color:var(--akzent);cursor:pointer;font-size:13px;font-weight:600;text-decoration:underline;padding:0;white-space:nowrap}
+/* ---- Hinweise ---- */
+.hinweise{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+.hinweise li{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;padding:10px 12px;border-radius:12px;background:var(--surface2);border:1px solid var(--line)}
+.hinweise li .sym{width:22px;height:22px;border-radius:50%;background:var(--surface);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex:0 0 auto;color:var(--muted)}
+.hinweise li.w{background:var(--warn-bg);border-color:var(--rand-warn)}
+.hinweise li.w .sym{background:var(--warn-voll);border-color:transparent;color:#fff}
+.hinweise li button{margin-left:auto;align-self:center;background:none;border:none;color:var(--akzent);cursor:pointer;font-size:13px;font-weight:700;text-decoration:underline;padding:0;white-space:nowrap}
 
-.monatsleiste{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.monatsleiste .titel{font-size:19px;font-weight:650;min-width:180px}
-.btn{border:1px solid var(--line-stark);background:var(--surface);border-radius:8px;min-height:38px;padding:0 12px;cursor:pointer;font-size:14px;font-weight:550}
-.btn:hover{background:var(--surface2)}
-.btn.prim{background:var(--akzent-voll);color:#fff;border-color:transparent}
+/* ---- CTA-Karte zur Monatsübersicht ---- */
+.cta{display:flex;align-items:center;gap:14px;padding:18px;border-radius:18px;text-decoration:none;color:#fff;
+  background:linear-gradient(135deg,var(--gtxt-a),var(--gtxt-b));box-shadow:0 10px 28px rgba(79,110,247,.35);
+  transition:transform .18s ease,box-shadow .18s ease;position:relative;overflow:hidden}
+.cta::after{content:"";position:absolute;top:-60%;left:-20%;width:60%;height:220%;transform:rotate(24deg);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent)}
+.cta:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(79,110,247,.45)}
+.cta-ico{width:44px;height:44px;border-radius:13px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.cta-ico svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.cta-txt{min-width:0}
+.cta-txt strong{display:block;font-size:16px;font-weight:750}
+.cta-txt span{font-size:12.5px;opacity:.88}
+.cta-pfeil{margin-left:auto;font-size:22px;font-weight:700;transition:transform .18s ease}
+.cta:hover .cta-pfeil{transform:translateX(4px)}
+
+/* ---- Aufklapp-Karten (details/summary) ---- */
+details.acc{border:1px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden}
+.acc summary{list-style:none;display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;font-weight:700;user-select:none;-webkit-user-select:none;font-size:14.5px}
+.acc summary::-webkit-details-marker{display:none}
+.acc summary:hover{background:var(--surface2)}
+.chev{margin-left:auto;width:22px;height:22px;flex:0 0 auto;position:relative;transition:transform .3s ease}
+.chev::before{content:"";position:absolute;left:6px;top:6px;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg)}
+details[open] > summary .chev{transform:rotate(180deg)}
+.acc-body{padding:2px 16px 18px}
+@media (prefers-reduced-motion:no-preference){
+  details[open] .acc-body{animation:accAuf .3s cubic-bezier(.2,.7,.2,1)}
+  @keyframes accAuf{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+}
+.acc-ico{width:32px;height:32px;border-radius:10px;background:var(--akzent-weich);color:var(--akzent);
+  display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-weight:800;font-size:13px}
+.acc-ico svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.acc-warn > summary .acc-ico{background:var(--warn-bg);color:var(--warn)}
+.acc-titel{display:flex;flex-direction:column;min-width:0}
+.acc-titel small{font-weight:550;color:var(--muted);font-size:12px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zaehler{background:var(--akzent-weich);color:var(--akzent);border-radius:999px;font-size:12px;font-weight:800;padding:2px 9px;margin-left:6px}
+.acc-warn .zaehler{background:var(--warn-bg);color:var(--warn)}
+.acc.klein{background:var(--surface2);border-radius:12px}
+.acc.klein summary{padding:10px 13px;font-size:13px;color:var(--muted);font-weight:650}
+.acc.klein .acc-body{padding:0 13px 12px}
+.sektliste details.acc + details.acc{margin-top:12px}
+.acc-body .hinweise{margin-top:4px}
+
+/* ---- Monats-Werkzeugleiste ---- */
+.monatsleiste{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.mnav{display:flex;align-items:center;gap:6px}
+.monatsleiste .titel{font-size:21px;font-weight:800;letter-spacing:-.01em;min-width:170px;text-align:center}
+.fluss{flex:1}
+.btn{border:1px solid var(--line-stark);background:var(--surface);border-radius:12px;min-height:40px;padding:0 14px;cursor:pointer;font-size:14px;font-weight:650;transition:border-color .15s,color .15s,background .15s,transform .12s}
+.btn:hover{border-color:var(--akzent);color:var(--akzent)}
+.btn:active{transform:scale(.97)}
+.btn.rund{min-width:40px;padding:0;border-radius:999px;font-size:19px;line-height:1}
+.btn.prim{background:linear-gradient(135deg,var(--gtxt-a),var(--gtxt-b));color:#fff;border-color:transparent;box-shadow:0 3px 12px rgba(79,110,247,.35)}
+.btn.prim:hover{color:#fff;filter:brightness(1.07)}
 .btn.gefahr{color:var(--minus);border-color:var(--minus)}
-.reiter{display:inline-flex;gap:3px;margin-bottom:14px;background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:3px}
-.reiter button{background:none;border:none;border-radius:8px;padding:8px 20px;cursor:pointer;font-weight:600;color:var(--muted);font-size:14.5px}
-.reiter button:hover{color:var(--text)}
-.reiter button.aktiv{background:var(--akzent-voll);color:#fff;box-shadow:0 1px 3px rgba(16,24,32,.25)}
+.btn.gefahr:hover{background:var(--tint-minus);color:var(--minus)}
+.monatsleiste select,.monatsleiste input{min-height:40px;border-radius:12px}
 
-/* 9 Kacheln: nur Spaltenzahlen verwenden, die aufgehen (3 oder 9) — sonst bleibt ein grauer Rest */
-.kacheln{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:14px}
-@media(min-width:1000px){.kacheln{grid-template-columns:repeat(9,1fr)}}
-.kacheln > div{background:var(--surface);padding:11px 13px}
-.kacheln .k{font-size:11px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;font-weight:700;min-height:30px}
-.kacheln .v{font-size:19px;font-weight:640;margin-top:2px}
-.kacheln > div.kp{background:var(--tint-plus)}
-.kacheln > div.km{background:var(--tint-minus)}
+/* ---- Reiter Monat/Jahr mit Gleiter ---- */
+.infokopf{display:flex;margin-bottom:16px}
+.reiter{position:relative;display:grid;grid-template-columns:1fr 1fr;background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:4px;min-width:220px}
+.reiter .glider{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:999px;
+  background:linear-gradient(135deg,var(--gtxt-a),var(--gtxt-b));box-shadow:0 2px 10px rgba(79,110,247,.4);
+  transition:transform .32s cubic-bezier(.3,.8,.3,1)}
+.reiter[data-pos="1"] .glider{transform:translateX(100%)}
+.reiter button{position:relative;z-index:1;background:none;border:none;border-radius:999px;padding:9px 20px;cursor:pointer;font-weight:700;color:var(--muted);font-size:14.5px;transition:color .25s}
+.reiter button:hover{color:var(--text)}
+.reiter button.aktiv{color:#fff}
+
+/* ---- Kennzahl-Kacheln (Bildschirm: Karten, Druck: 9er-Raster) ---- */
+.kacheln{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.kacheln > div{flex:1 1 150px;min-width:128px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:13px 15px;box-shadow:var(--schatten)}
+.kacheln > div:nth-child(-n+4){flex-basis:168px}
+.kacheln > div:nth-child(-n+4) .v{font-size:25px}
+.kacheln .k{font-size:10.5px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;font-weight:750}
+.kacheln .v{font-size:19px;font-weight:750;margin-top:4px}
+.kacheln > div.kp{background:var(--tint-plus);border-color:var(--rand-plus)}
+.kacheln > div.km{background:var(--tint-minus);border-color:var(--rand-minus)}
 .p{color:var(--plus)} .m{color:var(--minus)}
 
-/* Hoehe so begrenzt, dass der Kasten samt fixierter Kopfzeile ganz auf den Schirm passt;
+/* ---- Monatstabelle ----
+   Höhe so begrenzt, dass der Kasten samt fixierter Kopfzeile ganz auf den Schirm passt;
    gescrollt wird dann innerhalb der Tabelle, die Kopfzeile bleibt dabei stehen. */
-.tabwrap{overflow:auto;max-height:calc(100vh - 124px);border:1px solid var(--line);border-radius:10px;background:var(--surface);-webkit-overflow-scrolling:touch}
+.tabwrap{overflow:auto;max-height:calc(100vh - 124px);border:1px solid var(--line);border-radius:16px;background:var(--surface);-webkit-overflow-scrolling:touch;box-shadow:var(--schatten)}
+.tabwrap::-webkit-scrollbar{height:10px;width:10px}
+.tabwrap::-webkit-scrollbar-thumb{background:var(--line-stark);border-radius:5px}
+.tabwrap::-webkit-scrollbar-corner{background:transparent}
 table.monat{border-collapse:separate;border-spacing:0;width:100%;font-size:13px;table-layout:fixed;min-width:1178px}
 /* Feste Spaltenbreiten: sonst schiebt die automatische Verteilung den gesamten
    Ueberschuss in die Datumsspalte, die als fixierte Spalte dauerhaft Platz kostet. */
@@ -199,27 +397,34 @@ table.monat th:nth-child(13),table.monat td:nth-child(13){width:48px}
 table.monat th:nth-child(14),table.monat td:nth-child(14){width:78px}
 /* Notiz-Spalte bewusst ohne Breite: sie nimmt den Ueberschuss auf, damit die
    fixierten Spalten 1 und 2 exakt bei 86 px bzw. 32 px bleiben (sonst stimmt left nicht). */
-table.monat th{position:sticky;top:0;z-index:4;background:var(--surface2);text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:9px 5px;border-bottom:1px solid var(--line-stark);white-space:nowrap}
+table.monat th{position:sticky;top:0;z-index:4;background:var(--kopf-bg);text-align:left;font-size:10.5px;font-weight:750;letter-spacing:.05em;text-transform:uppercase;color:rgba(255,255,255,.72);padding:10px 5px;border-bottom:1px solid var(--line-stark);white-space:nowrap}
 table.monat td{padding:3px 5px;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle;height:42px}
 table.monat tr:last-child td{border-bottom:none}
+/* Zeilen-Hover als Überlagerung — funktioniert auch auf den getönten Zeilen */
+table.monat tbody tr:not(.wochenzeile):hover td{background-image:linear-gradient(rgba(124,154,255,.09),rgba(124,154,255,.09))}
 /* Fixiert: Datum (Spalte 1) und Wochentag (Spalte 2) bleiben beim Querscrollen links stehen.
    left muss exakt der Breite von Spalte 1 entsprechen (86 px, siehe oben). */
 table.monat th:nth-child(1),table.monat td:nth-child(1){position:sticky;left:0;z-index:3;background:var(--surface)}
 table.monat th:nth-child(2),table.monat td:nth-child(2){position:sticky;left:86px;z-index:3;background:var(--surface);box-shadow:1px 0 0 var(--line-stark)}
 /* Ecke: die fixierte Kopfzeile muss ueber den fixierten Spalten liegen */
-table.monat th:nth-child(1),table.monat th:nth-child(2){z-index:5;background:var(--surface2)}
+table.monat th:nth-child(1),table.monat th:nth-child(2){z-index:5;background:var(--kopf-bg)}
 /* Zeilenfarben — treffen alle Zellen der Zeile, also auch die fixierten Spalten */
 table.monat tr.z-blau td{background:var(--z-blau)}
 table.monat tr.z-gelb td{background:var(--z-gelb)}
 table.monat tr.z-gruen td{background:var(--z-gruen)}
 table.monat tr.z-rot td{background:var(--z-rot)}
+/* Kantenmarke links als zweites Signal neben der Fläche */
+table.monat tr.z-gruen td:nth-child(1){box-shadow:inset 3px 0 0 var(--plus)}
+table.monat tr.z-rot td:nth-child(1){box-shadow:inset 3px 0 0 var(--minus)}
+table.monat tr.z-gelb td:nth-child(1){box-shadow:inset 3px 0 0 var(--warn)}
+table.monat tr.z-blau td:nth-child(1){box-shadow:inset 3px 0 0 var(--line-stark)}
 /* Auf den kraeftigen Flaechen traegt die Zeilenfarbe die Aussage — die Zahl bleibt
    in der Grundfarbe, sonst reicht der Kontrast im Dunkelmodus nicht. */
 table.monat tr.z-gruen td .p,table.monat tr.z-gruen td .m,
 table.monat tr.z-rot td .p,table.monat tr.z-rot td .m{color:var(--text)}
 table.monat tr.z-gruen .bar,table.monat tr.z-rot .bar{background:rgba(0,0,0,.12)}
 table.monat tr.frei td{color:var(--muted)}
-/* Klassenname bewusst nicht "heute": den belegt bereits das Kachelraster der Stempeluhr (display:grid). */
+/* Klassenname bewusst nicht "heute": den belegt bereits das Kachelraster der Stempeluhr. */
 table.monat tr.tag-heute td:nth-child(1){box-shadow:inset 3px 0 0 var(--akzent)}
 /* Wochensumme: deutlich abgesetztes Band nach jeder Kalenderwoche */
 table.monat tr.wochenzeile td{
@@ -230,161 +435,144 @@ table.monat tr.wochenzeile td:nth-child(1){letter-spacing:.04em}
 table.monat tr.wochenzeile td:nth-child(3){
   font-weight:650;font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--akzent);
 }
+/* Zeilen erscheinen beim Monatswechsel gestaffelt (nur Deckkraft — schont die fixierten Spalten) */
+@media (prefers-reduced-motion:no-preference){
+  table.monat.rows-in tbody tr{animation:zeileAuf .45s ease both;animation-delay:calc(var(--i,0)*14ms)}
+  @keyframes zeileAuf{from{opacity:0}to{opacity:1}}
+}
 table.monat tr.blink td:nth-child(n+3){animation:blink 1.6s ease}
 @keyframes blink{0%,40%{background:var(--akzent-weich)}100%{background:transparent}}
 table.monat td.r{text-align:right}
 .calc{color:var(--muted)}
 .calc.stark{color:var(--text);font-weight:600}
-table.monat input.t{width:56px;min-height:32px;padding:3px 3px;border:1px solid transparent;border-radius:6px;background:transparent;text-align:center;font-variant-numeric:tabular-nums}
-table.monat input.t:hover{border-color:var(--line)}
-table.monat input.t:focus{border-color:var(--fokus);background:var(--surface);outline:none}
+/* Eingabefelder in der Tabelle: gestrichelte Linie = hier darf getippt werden */
+table.monat input.t{width:56px;min-height:34px;padding:3px 3px;border:1px solid transparent;border-bottom:1px dashed var(--line-stark);border-radius:8px;background:transparent;text-align:center;font-variant-numeric:tabular-nums;transition:border-color .15s,background .15s}
+table.monat input.t:hover{border-color:var(--akzent);background:var(--surface)}
+table.monat input.t:focus{border:1px solid var(--fokus);background:var(--surface);outline:none;box-shadow:0 0 0 3px var(--akzent-weich)}
 table.monat input.t::placeholder{color:var(--line-stark)}
-.artbtn{background:none;border:1px solid transparent;border-radius:6px;padding:4px 7px;cursor:pointer;font-size:12.5px;font-weight:600;color:inherit;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
-.artbtn:hover{border-color:var(--line);background:var(--surface2)}
-.notizbtn{background:none;border:1px solid transparent;border-radius:6px;padding:4px 7px;cursor:pointer;color:var(--muted);font-size:12.5px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;text-align:left}
-.notizbtn:hover{border-color:var(--line);background:var(--surface2)}
-.mark{font-size:10px;font-weight:700;color:var(--warn);margin-left:3px;vertical-align:super;cursor:help}
+.artbtn{background:none;border:1px solid transparent;border-radius:8px;padding:5px 8px;cursor:pointer;font-size:12.5px;font-weight:600;color:inherit;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;text-decoration:underline dotted var(--muted);text-underline-offset:3px;transition:background .15s,color .15s,border-color .15s}
+.artbtn:hover{border-color:var(--akzent);background:var(--akzent-weich);color:var(--akzent);text-decoration:none}
+.notizbtn{background:none;border:1px dashed transparent;border-radius:8px;padding:5px 8px;cursor:pointer;color:var(--muted);font-size:12.5px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;text-align:left;transition:background .15s,color .15s,border-color .15s}
+.notizbtn:hover{border-color:var(--akzent);background:var(--akzent-weich);color:var(--akzent)}
+.notizbtn .n-leer{opacity:.55}
+.mark{font-size:10px;font-weight:750;color:var(--warn);margin-left:3px;vertical-align:super;cursor:help}
 .stift{color:var(--muted);font-size:11px;margin-left:3px}
-.bar{display:block;position:relative;width:62px;height:8px;margin-top:3px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.bar{display:block;position:relative;width:62px;height:9px;margin-top:3px;background:var(--surface2);border-radius:5px;overflow:hidden}
 .bar::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line-stark)}
-.bfill{position:absolute;top:0;bottom:0;border-radius:4px}
+.bfill{position:absolute;top:0;bottom:0;border-radius:5px}
 .bfill.p{background:var(--bar-plus)} .bfill.m{background:var(--bar-minus)}
 
-#backdrop{position:fixed;inset:0;background:rgba(10,14,18,.44);z-index:40;display:none}
-#backdrop.an{display:block}
-#detail{position:fixed;z-index:50;right:0;top:0;bottom:0;width:min(580px,100%);background:var(--surface);border-left:1px solid var(--line);overflow-y:auto;display:none;box-shadow:-8px 0 30px rgba(0,0,0,.15);padding-bottom:calc(28px + env(safe-area-inset-bottom))}
-#detail.an{display:block}
-@media(max-width:640px){#detail{top:auto;height:92vh;width:100%;border-left:none;border-top:1px solid var(--line);border-radius:14px 14px 0 0}}
+/* ---- Tagesdetail: gleitet von rechts (Desktop) bzw. von unten (Telefon) herein ---- */
+#backdrop{position:fixed;inset:0;background:rgba(4,8,16,.5);z-index:40;opacity:0;pointer-events:none;
+  -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);transition:opacity .32s ease}
+#backdrop.an{opacity:1;pointer-events:auto}
+#detail{position:fixed;z-index:50;right:0;top:0;bottom:0;width:min(600px,100%);background:var(--surface);
+  border-left:1px solid var(--line);overflow-y:auto;box-shadow:-12px 0 34px rgba(0,0,0,.2);
+  padding-bottom:calc(28px + env(safe-area-inset-bottom));
+  transform:translateX(103%);visibility:hidden;
+  transition:transform .38s cubic-bezier(.32,.72,.22,1),visibility 0s linear .38s}
+#detail.an{transform:none;visibility:visible;transition:transform .38s cubic-bezier(.32,.72,.22,1)}
+.griff{display:none}
+@media(max-width:640px){
+  #detail{top:auto;height:92vh;width:100%;border-left:none;border-top:1px solid var(--line);
+    border-radius:20px 20px 0 0;transform:translateY(103%)}
+  .griff{display:block;width:44px;height:5px;border-radius:3px;background:var(--line-stark);margin:10px auto 2px}
+}
 .dkopf{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);padding:14px 16px;display:flex;align-items:center;gap:10px;z-index:2}
-.dkopf .dt{font-weight:650;font-size:17px}
+.dkopf .dt{font-weight:750;font-size:17px}
 .dkopf .ds{color:var(--muted);font-size:13px}
 .dbody{padding:14px 16px}
-.ivliste{display:flex;flex-direction:column;gap:6px;margin:6px 0 0}
+.ivliste{display:flex;flex-direction:column;gap:7px;margin:6px 0 0}
 .ivzeile{display:flex;align-items:center;gap:8px}
-.ivzeile input.t{width:84px;min-height:44px;text-align:center;border:1px solid var(--line-stark);border-radius:8px;background:var(--surface2);padding:4px 6px}
-.ivzeile input.g{flex:1;min-height:44px;border:1px solid var(--line-stark);border-radius:8px;background:var(--surface2);padding:4px 10px;min-width:60px}
-.ivzeile input.z{width:92px;min-height:44px;text-align:right;border:1px solid var(--line-stark);border-radius:8px;background:var(--surface2);padding:4px 8px}
+.ivzeile input.t{width:84px;min-height:44px;text-align:center;border:1px solid var(--line-stark);border-radius:11px;background:var(--surface2);padding:4px 6px}
+.ivzeile input.g{flex:1;min-height:44px;border:1px solid var(--line-stark);border-radius:11px;background:var(--surface2);padding:4px 10px;min-width:60px}
+.ivzeile input.z{width:92px;min-height:44px;text-align:right;border:1px solid var(--line-stark);border-radius:11px;background:var(--surface2);padding:4px 8px}
 .ivzeile .bis{color:var(--muted);font-size:14px}
-.del{border:1px solid var(--line);background:var(--surface);border-radius:8px;min-width:44px;min-height:44px;cursor:pointer;color:var(--muted);font-size:16px;line-height:1}
+.del{border:1px solid var(--line);background:var(--surface);border-radius:11px;min-width:44px;min-height:44px;cursor:pointer;color:var(--muted);font-size:16px;line-height:1;transition:color .15s,border-color .15s}
 .del:hover{color:var(--minus);border-color:var(--minus)}
-.addbtn{margin-top:8px;border:1px dashed var(--line-stark);background:none;border-radius:8px;min-height:44px;padding:0 12px;cursor:pointer;color:var(--muted);font-size:13.5px;font-weight:600;width:100%}
-.addbtn:hover{color:var(--text);border-color:var(--text)}
+.addbtn{margin-top:8px;border:1.5px dashed var(--line-stark);background:none;border-radius:12px;min-height:44px;padding:0 12px;cursor:pointer;color:var(--muted);font-size:13.5px;font-weight:650;width:100%;transition:color .15s,border-color .15s,background .15s}
+.addbtn:hover{color:var(--akzent);border-color:var(--akzent);background:var(--akzent-weich)}
 .rechnung{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:6px}
-.rechnung td{padding:6px 2px;border-bottom:1px solid var(--line)}
+.rechnung td{padding:7px 2px;border-bottom:1px solid var(--line)}
 .rechnung td:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-.rechnung tr.sum td{font-weight:700;border-bottom:none;border-top:1px solid var(--line-stark);padding-top:8px}
+.rechnung tr.sum td{font-weight:750;border-bottom:none;border-top:1px solid var(--line-stark);padding-top:8px}
 .rechnung tr.zwi td{color:var(--muted)}
 
+/* ---- Formulare ---- */
 .feld{margin-bottom:14px}
-.feld > label{display:block;font-size:13px;font-weight:650;margin-bottom:5px}
-.feld .sub{font-size:12.5px;color:var(--muted);margin-top:4px}
-input[type=text],input[type=date],input[type=number],select,textarea{width:100%;min-height:46px;padding:8px 11px;border:1px solid var(--line-stark);border-radius:9px;background:var(--surface2)}
+.feld > label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+.feld .sub{font-size:12.5px;color:var(--muted);margin-top:5px}
+input[type=text],input[type=date],input[type=number],select,textarea{width:100%;min-height:46px;padding:9px 12px;border:1.5px solid var(--line-stark);border-radius:12px;background:var(--surface2);transition:border-color .15s,box-shadow .15s}
+input[type=text]:focus,input[type=date]:focus,input[type=number]:focus,select:focus,textarea:focus{border-color:var(--fokus);outline:none;box-shadow:0 0 0 3px var(--akzent-weich)}
 textarea{min-height:84px;resize:vertical;line-height:1.45}
 input.kurz{max-width:150px}
 .reihe{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
-.chips{display:flex;gap:6px;flex-wrap:wrap}
-.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-stark);border-radius:999px;padding:8px 14px;cursor:pointer;font-size:14px;background:var(--surface2);user-select:none;min-height:44px}
-.chip input{margin:0;width:auto;min-height:0;accent-color:var(--akzent)}
-.chip.an{background:var(--akzent-weich);border-color:var(--akzent);color:var(--akzent);font-weight:600}
-.schalter{display:flex;align-items:center;gap:10px;cursor:pointer;min-height:44px;font-size:14px;font-weight:600}
-.schalter input{width:auto;min-height:0;accent-color:var(--akzent);transform:scale(1.25);margin:0 2px 0 0}
-.kernblock{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;background:var(--surface2)}
-.kernblock .wt{font-weight:650;font-size:13.5px;margin-bottom:6px}
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.chip{position:relative;display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line-stark);border-radius:999px;padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;background:var(--surface2);user-select:none;-webkit-user-select:none;min-height:44px;transition:background .18s,border-color .18s,color .18s,box-shadow .18s}
+.chip input{position:absolute;opacity:0;pointer-events:none;margin:0;width:1px;height:1px;min-height:0}
+.chip:hover{border-color:var(--akzent)}
+.chip.an{background:linear-gradient(135deg,var(--gtxt-a),var(--gtxt-b));border-color:transparent;color:#fff;font-weight:700;box-shadow:0 3px 12px rgba(79,110,247,.35)}
+/* Schalter im iOS-Stil */
+.schalter{display:flex;align-items:center;gap:11px;cursor:pointer;min-height:44px;font-size:14px;font-weight:650}
+.schalter input{appearance:none;-webkit-appearance:none;width:47px;height:28px;min-height:0;border-radius:999px;background:var(--line-stark);position:relative;transition:background .25s;margin:0;flex:0 0 auto;cursor:pointer;border:none}
+.schalter input::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.35);transition:transform .25s cubic-bezier(.3,.8,.3,1)}
+.schalter input:checked{background:linear-gradient(135deg,var(--gtxt-a),var(--gtxt-b))}
+.schalter input:checked::after{transform:translateX(19px)}
+.kernblock{border:1px solid var(--line);border-radius:13px;padding:11px 13px;margin-bottom:9px;background:var(--surface2)}
+.kernblock .wt{font-weight:700;font-size:13.5px;margin-bottom:6px}
 .trenner{height:1px;background:var(--line);margin:22px 0}
 .knopfreihe{display:flex;gap:10px;flex-wrap:wrap}
+
+/* ---- Jahresansicht ---- */
 .jahrtab{width:100%;border-collapse:collapse;font-size:14px}
-.jahrtab th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:8px;border-bottom:1px solid var(--line-stark)}
+.jahrtab th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:9px 8px;border-bottom:1px solid var(--line-stark)}
 .jahrtab th.r,.jahrtab td.r{text-align:right}
-.jahrtab td{padding:9px 8px;border-bottom:1px solid var(--line)}
-.jahrtab tr.jetzt td{font-weight:650}
-.legende{color:var(--muted);font-size:12.5px;margin-top:10px}
-.farbchip{display:inline-block;width:13px;height:13px;border-radius:3px;border:1px solid var(--line-stark);vertical-align:-2px;margin-right:5px}
+.jahrtab td{padding:10px 8px;border-bottom:1px solid var(--line)}
+.jahrtab tbody tr:hover td{background:var(--surface2)}
+.jahrtab tr.jetzt td{font-weight:700;background:var(--akzent-weich)}
+.legende{color:var(--muted);font-size:12.5px;margin-top:6px;line-height:1.7}
+.farbchip{display:inline-block;width:13px;height:13px;border-radius:4px;border:1px solid var(--line-stark);vertical-align:-2px;margin-right:5px}
 
 #druckkopf{display:none}
 .unterschrift{display:none}
 
-/* =========================================================================
-   Entwurf „Cockpit" — nur Optik, arbeitet ausschliesslich mit den Tokens oben
-   ========================================================================= */
-
-/* --- Statuskarte: die Uhr wird zum Hauptmotiv --- */
-.status{padding:24px;border-left-width:0;border:1px solid var(--line);
-  position:relative;overflow:hidden;border-radius:12px}
-.status .zeile1{align-items:center}
-.status .zustand{font-size:17px;font-weight:600;color:var(--muted);
-  display:inline-flex;align-items:center;gap:9px;text-transform:uppercase;letter-spacing:.08em}
-.status .uhr{width:100%;margin:10px 0 0;font-size:54px;font-weight:600;
-  letter-spacing:-.03em;color:var(--text)}
-.status .seit{margin-top:2px}
-@media(max-width:560px){.status .uhr{font-size:42px}}
-
-.status[data-z="arbeit"]{background:var(--tint-plus);border-color:var(--rand-plus)}
-.status[data-z="pause"]{background:var(--warn-bg);border-color:var(--rand-warn)}
-.status[data-z="dienstgang"]{background:var(--tint-akzent);border-color:var(--rand-akzent)}
-.status[data-z="arbeit"] .marker{background:var(--tint-plus);border:1px solid var(--rand-plus);color:var(--plus)}
-.status[data-z="pause"] .marker{background:var(--warn-bg);border:1px solid var(--rand-warn);color:var(--warn)}
-.status[data-z="dienstgang"] .marker{background:var(--tint-akzent);border:1px solid var(--rand-akzent);color:var(--akzent)}
-
-/* Pulspunkt, nur solange Arbeitszeit oder Dienstgang laeuft */
-.status .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;display:none;
-  background:var(--plus);animation:puls 2s infinite}
-.status[data-z="arbeit"] .dot,.status[data-z="dienstgang"] .dot{display:inline-block}
-.status[data-z="dienstgang"] .dot{background:var(--akzent)}
-@keyframes puls{
-  0%{box-shadow:0 0 0 0 var(--puls)}
-  70%{box-shadow:0 0 0 9px rgba(0,0,0,0)}
-  100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}
+@media(max-width:560px){
+  .topbar-in{gap:8px;padding:8px 12px}
+  main{padding:16px 12px 72px}
+  .pad{padding:15px}
+  .status{padding:18px}
+  .konto .gross{font-size:38px}
+  .monatsleiste .titel{min-width:0;font-size:18px}
 }
 
-/* --- Buchungstasten: farbiger Rand statt Vollton --- */
-.taste{min-height:80px;border-radius:12px;background:var(--surface);
-  border:1.5px solid var(--line-stark);box-shadow:none!important}
-.taste svg{width:24px;height:24px}
-.taste.kommen:not([disabled]){background:var(--tint-plus);color:var(--plus);border-color:var(--rand-plus)}
-.taste.gehen:not([disabled]){background:var(--tint-minus);color:var(--minus);border-color:var(--rand-minus)}
-.taste.pause:not([disabled]){background:var(--warn-bg);color:var(--warn);border-color:var(--rand-warn)}
-.taste.dienstgang:not([disabled]){background:var(--tint-akzent);color:var(--akzent);border-color:var(--rand-akzent)}
-.taste[disabled]{background:var(--surface2);color:var(--muted);border-color:var(--line);opacity:1;box-shadow:none}
-
-/* --- Kennzahlen --- */
-.label{color:var(--akzent);letter-spacing:.1em}
-.konto .gross{font-size:46px;font-weight:650}
-.heute{border-radius:10px}
-.heute > div{padding:14px 16px}
-.heute .v{font-size:20px}
-.gross-link{border-radius:12px;background:var(--surface);
-  border-color:var(--line-stark);box-shadow:none}
-
-/* --- Tabelle: Status als Kantenmarke, Flaechen bleiben ruhig --- */
-.tabwrap{border-radius:10px}
-table.monat th{background:var(--kopf-bg);color:var(--muted)}
-table.monat td{height:40px}
-table.monat tr.z-gruen td:nth-child(1){box-shadow:inset 3px 0 0 var(--plus)}
-table.monat tr.z-rot td:nth-child(1){box-shadow:inset 3px 0 0 var(--minus)}
-table.monat tr.z-gelb td:nth-child(1){box-shadow:inset 3px 0 0 var(--warn)}
-table.monat tr.z-blau td:nth-child(1){box-shadow:inset 3px 0 0 var(--line-stark)}
-table.monat tr.wochenzeile td{border-top:1.5px solid var(--akzent);
-  border-bottom:1.5px solid var(--akzent);color:var(--text)}
-
+/* =========================================================================
+   Druck: unverändertes, nüchternes Nachweisblatt
+   ========================================================================= */
 @media print{
   @page{size:A4 landscape;margin:11mm}
   body{background:#fff;color:#000;font-size:10pt}
-  .topbar,#banner,.reiter,.monatsleiste,#toast,#backdrop,#detail,.noprint,.aktionen,.legende,#warnBox{display:none!important}
+  .topbar,#banner,.reiter,.monatsleiste,#toast,#backdrop,#detail,.noprint,.aktionen,.legende,#warnBox,
+  .aurora,.bottomnav,.infokopf,.gruss,.cta,.spark,.spark-label,details.acc{display:none!important}
+  .reveal{opacity:1!important;transform:none!important;transition:none!important}
+  .rollin{opacity:1!important;transform:none!important;margin-top:0!important;margin-bottom:0!important}
+  .scrollhint{display:none!important}
+  .hero{min-height:auto!important;padding-bottom:0!important}
   main{max-width:none;padding:0}
   #druckkopf{display:block;margin-bottom:6mm}
   #druckkopf .dtitel{font-size:15pt;font-weight:700}
   #druckkopf .dzeile{font-size:9.5pt;margin-top:1.5mm}
   .karte{border:none;box-shadow:none;background:#fff}
-  .tabwrap{overflow:visible;max-height:none;border:1px solid #888;border-radius:0}
+  .tabwrap{overflow:visible;max-height:none;border:1px solid #888;border-radius:0;box-shadow:none}
   table.monat{min-width:0;font-size:8pt;table-layout:auto;print-color-adjust:exact;-webkit-print-color-adjust:exact}
   table.monat th,table.monat td{width:auto!important}
   table.monat th{background:#eee;color:#000;position:static;border-bottom:1px solid #666;padding:2px 3px;font-size:7pt}
   table.monat td{padding:1px 3px;height:auto;border-bottom:1px solid #ddd}
+  table.monat tbody tr:hover td{background-image:none}
   table.monat tr.frei td{color:#444}
   table.monat th:nth-child(1),table.monat th:nth-child(2){position:static;box-shadow:none;background:#eee}
   table.monat td:nth-child(1),table.monat td:nth-child(2){position:static;box-shadow:none;background:none}
   table.monat tr.tag-heute td:nth-child(1){box-shadow:none}
-  /* Die Kantenmarken des Cockpit-Entwurfs sind spezifischer als die Ruecksetzregel oben
+  /* Die Kantenmarken sind spezifischer als die Ruecksetzregel oben
      und wuerden sonst im Ausdruck erscheinen — das Druckblatt bleibt unveraendert. */
   table.monat tr.z-gruen td:nth-child(1),table.monat tr.z-rot td:nth-child(1),
   table.monat tr.z-gelb td:nth-child(1),table.monat tr.z-blau td:nth-child(1){box-shadow:none}
@@ -395,6 +583,7 @@ table.monat tr.wochenzeile td{border-top:1.5px solid var(--akzent);
   table.monat tr.wochenzeile td{background:#dfe8f2;color:#000;font-weight:700;
     border-top:1.4px solid #1f4e79;border-bottom:1.4px solid #1f4e79}
   table.monat tr.wochenzeile td:nth-child(3){color:#1f4e79;font-size:7pt;letter-spacing:.06em}
+  table.monat.rows-in tbody tr{animation:none}
   table.monat input.t{border:none;background:none;width:34px;padding:0;color:#000;min-height:0;font-size:8pt}
   /* Spaltentrenner: feine Linie zwischen allen Spalten, kraeftige an den Gruppengrenzen
      (Datum+Tag | Art | Kommen+Gehen | Pause | Dienstgang | Berechnung | Notiz) */
@@ -414,13 +603,14 @@ table.monat tr.wochenzeile td{border-top:1.5px solid var(--akzent);
   table.monat thead{display:table-header-group}
   table.monat tr{break-inside:avoid}
   /* Monatskennzahlen als eine saubere Reihe statt mit Umbruch */
-  .kacheln{grid-template-columns:repeat(9,1fr);margin-bottom:4mm}
-  .kacheln > div{padding:3px 5px;background:#fff}
+  .kacheln{display:grid;grid-template-columns:repeat(9,1fr);gap:1px;margin-bottom:4mm}
+  .kacheln > div{padding:3px 5px;background:#fff;border:none;border-radius:0;box-shadow:none;min-width:0}
   .kacheln > div.kp{background:#e3f4ea}
   .kacheln > div.km{background:#fde7e3}
   .kacheln .k{font-size:6pt;min-height:20px;letter-spacing:.02em}
   .kacheln .v{font-size:9.5pt;margin-top:0}
-  .artbtn,.notizbtn{border:none;padding:0;color:#000;max-width:none}
+  .kacheln > div:nth-child(-n+4) .v{font-size:9.5pt}
+  .artbtn,.notizbtn{border:none;padding:0;color:#000;max-width:none;text-decoration:none}
   .bar,.mark,.stift{display:none}
   .calc{color:#000}
   .kacheln{border:1px solid #888;background:#888}
@@ -433,19 +623,30 @@ table.monat tr.wochenzeile td{border-top:1.5px solid var(--akzent);
 </head>
 <body>
 
+<div class="aurora noprint" aria-hidden="true"><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
+
 <header class="topbar noprint">
   <div class="topbar-in">
-    <div class="marke">Zeiterfassung <span>· privat</span></div>
+    <a class="marke" href="#/stempel" aria-label="Zeiterfassung – Startseite">
+      <span class="logo"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v4.5l3 2"/></svg></span>
+      <span class="marke-txt">Zeiterfassung</span>
+    </a>
     <nav class="nav">
       <a href="#/stempel" data-nav="stempel">Stempeluhr</a>
-      <a href="#/info" data-nav="info">Info</a>
-      <button class="iconbtn" id="themeBtn" title="Hell / Dunkel umschalten" aria-label="Hell / Dunkel umschalten">◐</button>
-      <a href="#/einstellungen" class="iconbtn" data-nav="einstellungen" title="Einstellungen" aria-label="Einstellungen">⚙</a>
+      <a href="#/info" data-nav="info">Übersicht</a>
+      <a href="#/einstellungen" data-nav="einstellungen">Einstellungen</a>
     </nav>
+    <button class="iconbtn" id="themeBtn" title="Hell / Dunkel umschalten" aria-label="Hell / Dunkel umschalten"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></button>
   </div>
 </header>
 <div id="banner" role="status"></div>
 <main id="view"></main>
+
+<nav class="bottomnav noprint" aria-label="Hauptnavigation">
+  <a href="#/stempel" data-nav="stempel"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v4.5l3 2"/></svg><span>Stempeluhr</span></a>
+  <a href="#/info" data-nav="info"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9.5h18M8.5 2.5v3.5M15.5 2.5v3.5M7 13.5h4M7 17h7"/></svg><span>Übersicht</span></a>
+  <a href="#/einstellungen" data-nav="einstellungen"><svg viewBox="0 0 24 24"><path d="M4 7.5h9M17.5 7.5H20M4 16.5h3M11.5 16.5H20"/><circle cx="15" cy="7.5" r="2.4"/><circle cx="9" cy="16.5" r="2.4"/></svg><span>Einstellungen</span></a>
+</nav>
 
 <div id="backdrop"></div>
 <aside id="detail" aria-label="Tagesdetail"></aside>
@@ -793,11 +994,11 @@ function berechneTag(key, tag, e, opt){
 
   /* --- Warnungen und Hinweise --- */
   if(gekappt>0) w("warn","Arbeitszeit auf "+fmtDauer(e.kappung)+" h gekappt — "+fmtDauer(gekappt)+" h fallen weg.");
-  else if(ueberGrenze>0) w("hinweis","Arbeitszeit "+fmtDauer(netto)+" h — über der Tagesgrenze von "+fmtDauer(e.kappung)+" h (§ 3 ArbZG). Die Zeit wird voll gutgeschrieben.");
+  else if(ueberGrenze>0) w("hinweis","Arbeitszeit "+fmtDauer(netto)+" h — über der Tagesgrenze von "+fmtDauer(e.kappung)+" h. Die Zeit wird voll gutgeschrieben.");
   /* Ist gar keine Pause gestempelt, wird die Mindestpause still automatisch abgezogen — keine Meldung.
      Nur eine tatsaechlich gestempelte, zu kurze Pause wird als ruhiger Hinweis vermerkt. */
   if(brutto>0 && gebucht>0 && gebucht < pflicht)
-    w("hinweis","Gestempelte Pause ("+fmtDauer(gebucht)+" h) ist kürzer als die Mindestpause von "+fmtDauer(pflicht)+" h — abgezogen wurden "+fmtDauer(pflicht)+" h (§ 4 ArbZG).");
+    w("hinweis","Gestempelte Pause ("+fmtDauer(gebucht)+" h) ist kürzer als die Mindestpause von "+fmtDauer(pflicht)+" h — abgezogen wurden "+fmtDauer(pflicht)+" h.");
   if(zuschlag>0) w("warn","Verspätungszuschlag "+fmtDauer(zuschlag)+" h — "+zuschlagInfo+".");
   if(offen && jetztMin!==null) w("hinweis","Eine Buchung läuft noch.");
 
@@ -1021,7 +1222,8 @@ function kontoWarnungen(){
 /* =========================================================================
    Router
    ========================================================================= */
-var ansicht={seite:"stempel", jahr:new Date().getFullYear(), monat:new Date().getMonth(), reiter:"monat"};
+var ansicht={seite:"stempel", jahr:new Date().getFullYear(), monat:new Date().getMonth(), reiter:"monat",
+  warnAuf:undefined, legendeAuf:false, einstOffen:{}};
 function route(){
   var h=(location.hash||"").replace(/^#\/?/,"");
   var seite = h.split("?")[0] || "stempel";
@@ -1029,9 +1231,8 @@ function route(){
   ansicht.seite=seite;
   var navs=document.querySelectorAll("[data-nav]");
   for(var i=0;i<navs.length;i++)
-    navs[i].className = navs[i].getAttribute("data-nav")==="einstellungen"
-      ? "iconbtn"+(seite==="einstellungen"?" aktiv":"")
-      : (navs[i].getAttribute("data-nav")===seite?"aktiv":"");
+    navs[i].classList.toggle("aktiv", navs[i].getAttribute("data-nav")===seite);
+  ansicht._frisch=true;
   zeichne();
   window.scrollTo(0,0);
 }
@@ -1052,6 +1253,88 @@ function zeichne(){
   else zeichneEinstellungen();
 }
 
+/* =========================================================================
+   Animationen: Scroll-Reveal und zaehlende Kennzahlen
+   ========================================================================= */
+function reduzierteBewegung(){
+  return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+}
+var _io=null;
+function revealInit(){
+  var els=document.querySelectorAll(".reveal:not(.in)");
+  if(!els.length) return;
+  if(reduzierteBewegung() || !("IntersectionObserver" in window)){
+    for(var i=0;i<els.length;i++) els[i].classList.add("in");
+    return;
+  }
+  if(_io) _io.disconnect();
+  _io=new IntersectionObserver(function(eintraege){
+    eintraege.forEach(function(x){
+      if(x.isIntersecting){ x.target.classList.add("in"); _io.unobserve(x.target); }
+    });
+  },{threshold:.1,rootMargin:"0px 0px -10% 0px"});
+  for(var j=0;j<els.length;j++) _io.observe(els[j]);
+}
+function animWert(el,ziel,fmt){
+  var start=null, dauer=700;
+  function schritt(ts){
+    if(start===null) start=ts;
+    var t=Math.min(1,(ts-start)/dauer);
+    var eased=1-Math.pow(1-t,3);
+    var v=Math.round(ziel*eased);
+    el.textContent=(fmt==="saldo"?fmtSaldo(v):fmtDauer(v))+" h";
+    if(t<1) window.requestAnimationFrame(schritt);
+  }
+  window.requestAnimationFrame(schritt);
+}
+function animKacheln(){
+  if(reduzierteBewegung()) return;
+  var els=document.querySelectorAll(".kacheln .v[data-min]");
+  for(var i=0;i<els.length;i++)
+    animWert(els[i], parseInt(els[i].getAttribute("data-min"),10)||0, els[i].getAttribute("data-fmt"));
+}
+
+/* Scroll-gekoppeltes Hereinrollen: der Fortschritt haengt direkt an der
+   Scroll-Position — die Karten rollen beim Wischen nacheinander ins Bild. */
+var _rollEls=[], _rollGebunden=false;
+function rollInit(){
+  _rollEls=Array.prototype.slice.call(document.querySelectorAll(".rollin"));
+  if(reduzierteBewegung()){
+    _rollEls.forEach(function(el){ el.style.opacity="1"; el.style.transform="none"; });
+    _rollEls=[];
+  }
+  if(!_rollGebunden){
+    window.addEventListener("scroll", rollTick, {passive:true});
+    window.addEventListener("resize", rollTick, {passive:true});
+    _rollGebunden=true;
+  }
+  rollTick();
+}
+function rollTick(){
+  var hint=document.getElementById("scrollHint");
+  if(hint){
+    var scrollbar=document.documentElement.scrollHeight > window.innerHeight+40;
+    hint.style.opacity=(scrollbar && window.scrollY<60)?"1":"0";
+  }
+  if(!_rollEls.length) return;
+  window.requestAnimationFrame(function(){
+    var vh=window.innerHeight;
+    var amEnde=(window.scrollY+vh)>=(document.documentElement.scrollHeight-8);
+    for(var i=0;i<_rollEls.length;i++){
+      var el=_rollEls[i];
+      if(!el.isConnected) continue;
+      var top=el.getBoundingClientRect().top;
+      /* 0 = Oberkante am unteren Rand, 1 = Oberkante bei 45 % der Hoehe */
+      var p=(vh-top)/(vh*0.55);
+      if(amEnde) p=1;
+      p=Math.max(0,Math.min(1,p));
+      var e2=1-Math.pow(1-p,3);
+      el.style.opacity=String(Math.min(1,0.04+0.96*e2));
+      el.style.transform="perspective(1100px) translateY("+Math.round((1-e2)*90)+"px) rotateX("+((1-e2)*13).toFixed(2)+"deg) scale("+(0.94+0.06*e2).toFixed(4)+")";
+    }
+  });
+}
+
 /* ---------- Seite 1: Stempeluhr ---------- */
 var SVG={
   kommen:'<svg viewBox="0 0 24 24"><path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4"/><path d="M10 8l4 4-4 4"/><path d="M14 12H3"/></svg>',
@@ -1059,42 +1342,93 @@ var SVG={
   pause:'<svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>',
   dienstgang:'<svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>'
 };
+function begruessung(){
+  var h=new Date().getHours();
+  var g = h<5?"Gute Nacht":h<11?"Guten Morgen":h<14?"Mahlzeit":h<18?"Guten Tag":"Guten Abend";
+  var n=(E().name||"").trim().split(" ")[0];
+  return g+(n?", "+n:"")+"!";
+}
+/* Tagessalden der letzten 14 Tage als Mini-Verlauf */
+function sparkHtml(){
+  var tage=[], max=60;
+  for(var i=13;i>=0;i--){
+    var d=new Date(); d.setDate(d.getDate()-i);
+    var k=keyOf(d), r=tagRechnung(k);
+    var frei=(r.dow===0||r.dow===6||r.art==="wochenende"||r.art==="feiertag");
+    tage.push({key:k,saldo:r.saldo,frei:frei,dow:r.dow});
+    if(Math.abs(r.saldo)>max) max=Math.abs(r.saldo);
+  }
+  var h='<div class="spark noprint">';
+  tage.forEach(function(t){
+    var hpx=Math.max(4,Math.round(Math.abs(t.saldo)/max*30));
+    var cls=(t.frei&&!t.saldo)?"w":(t.saldo>=0?"p":"m");
+    h+='<span class="sp-t" title="'+esc(WT_KURZ[t.dow])+' '+esc(fmtDatumKurz(t.key))+' · '+esc(fmtSaldo(t.saldo))+' h">'
+      +'<i class="'+cls+' '+(t.saldo>=0?"oben":"unten")+'" style="height:'+hpx+'px"></i></span>';
+  });
+  return h+'</div><div class="spark-label noprint">Tagessalden der letzten 14 Tage</div>';
+}
 function zeichneStempel(){
   var hk=heuteKey(), r=tagRechnung(hk);
   var kw=kontoWarnungen();
   var konto=kontostandBis(hk);
   var mb=monatsBilanz(new Date().getFullYear(), new Date().getMonth());
 
+  var fx=ansicht._frisch?"reveal":"reveal in"; ansicht._frisch=false;
   var html='<div class="eng">';
-  html+='<div class="karte status" id="statuskarte" data-z=""></div>';
-  html+='<div class="tasten">'
-    +'<button class="taste kommen" data-akt="kommen">'+SVG.kommen+'<span>KOMMEN</span></button>'
-    +'<button class="taste gehen" data-akt="gehen">'+SVG.gehen+'<span>GEHEN</span></button>'
-    +'<button class="taste pause" data-akt="pause">'+SVG.pause+'<span id="pauseTxt">PAUSE</span></button>'
-    +'<button class="taste dienstgang" data-akt="dienstgang">'+SVG.dienstgang+'<span id="dgTxt">DIENSTGANG</span></button>'
-    +'</div>';
+  html+='<div class="hero '+fx+'">';
+  html+='<div class="gruss"><h1>'+esc(begruessung())+'</h1>'
+    +'<p class="hint">'+esc(WT_LANG[dateOf(hk).getDay()])+', '+esc(fmtDatum(hk))+(r.feiertag?' · '+esc(r.feiertag):'')+'</p></div>';
 
-  html+='<div class="karte pad" style="margin-top:14px">'
+  /* Statuskarte als festes Geruest — tick() aktualisiert nur die Werte darin */
+  html+='<section class="karte status" id="statuskarte" data-z="">'
+    +'<div class="s-links">'
+    +'<div class="zeile1"><span class="zustand"><i class="dot"></i><span id="zustandTxt">–</span></span></div>'
+    +'<div class="uhr" id="uhrTxt">--:--:--</div>'
+    +'<div class="seit" id="seitTxt"></div>'
+    +'</div>'
+    +'<div class="s-ring" role="img" aria-label="Tagesfortschritt"><svg viewBox="0 0 120 120" aria-hidden="true">'
+    +'<defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0"/><stop offset="1"/></linearGradient></defs>'
+    +'<circle class="ring-bg" cx="60" cy="60" r="52"/>'
+    +'<circle class="ring-fill" id="ringFill" cx="60" cy="60" r="52"/>'
+    +'</svg><div class="ring-mitte"><div class="ring-pct" id="ringPct">0%</div><div class="ring-sub" id="ringSub">vom Tagessoll</div></div></div>'
+    +'</section>';
+
+  html+='<div class="tasten">'
+    +'<button class="taste kommen" data-akt="kommen">'+SVG.kommen+'<span class="tl">Kommen</span></button>'
+    +'<button class="taste gehen" data-akt="gehen">'+SVG.gehen+'<span class="tl">Gehen</span></button>'
+    +'<button class="taste pause" data-akt="pause">'+SVG.pause+'<span class="tl" id="pauseTxt">Pause</span></button>'
+    +'<button class="taste dienstgang" data-akt="dienstgang">'+SVG.dienstgang+'<span class="tl" id="dgTxt">Dienstgang</span></button>'
+    +'</div>';
+  html+='<div class="scrollhint noprint" id="scrollHint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div>';
+  html+='</div>';
+
+  html+='<section class="karte pad rollin">'
+    +'<div class="label">Heute</div>'
+    +'<div class="heute" id="heuteBox"></div>'
+    +'<ul class="hinweise" id="heuteHinweise" style="margin-top:12px"></ul></section>';
+
+  html+='<section class="karte pad rollin">'
     +'<div class="label">Stundenkonto</div><div class="konto">'
     +'<div class="gross '+(konto>0?"p":konto<0?"m":"")+'" id="kontoGross">'+esc(fmtSaldo(konto))+'</div>'
-    +'<div class="neben">Saldo '+esc(MONATE[new Date().getMonth()])+': <strong class="'+(mb.saldo>0?"p":mb.saldo<0?"m":"")+'">'+esc(fmtSaldo(mb.saldo))+'</strong><br>'
-    +'<span style="font-size:12.5px">'+(E().stichtag
-        ? 'Stichtag '+esc(fmtDatum(E().stichtag))+', Startwert '+esc(fmtSaldo(E().startKonto))
-        : 'Kein Stichtag gesetzt — das Konto zählt noch nicht.')
-    +'<br>Stand einschließlich des heutigen Tages: Solange das Tagessoll nicht erreicht ist, zieht der laufende Tag das Konto ins Minus.</span></div></div>';
+    +'<div class="neben">Saldo '+esc(MONATE[new Date().getMonth()])+': <strong class="'+(mb.saldo>0?"p":mb.saldo<0?"m":"")+'">'+esc(fmtSaldo(mb.saldo))+'</strong></div></div>'
+    +sparkHtml();
   if(kw.length){
     html+='<ul class="hinweise" style="margin-top:12px">';
     kw.forEach(function(t){ html+='<li class="w"><span class="sym">!</span><span>'+esc(t)+'</span></li>'; });
     html+='</ul>';
   }
-  html+='</div>';
+  html+='<details class="acc klein noprint" style="margin-top:14px"><summary>Wie rechnet das Konto?<span class="chev"></span></summary>'
+    +'<div class="acc-body"><p class="hint" style="margin:0">'
+    +(E().stichtag
+        ? 'Stichtag '+esc(fmtDatum(E().stichtag))+', Startwert '+esc(fmtSaldo(E().startKonto))+' h. '
+        : 'Kein Stichtag gesetzt — das Konto zählt noch nicht. ')
+    +'Der Stand schließt den heutigen Tag ein: Solange das Tagessoll nicht erreicht ist, zieht der laufende Tag das Konto ins Minus.</p></div></details>';
+  html+='</section>';
 
-  html+='<div class="karte pad" style="margin-top:14px">'
-    +'<div class="label">Heute · '+esc(WT_LANG[dateOf(hk).getDay()])+', '+esc(fmtDatum(hk))+(r.feiertag?' · '+esc(r.feiertag):'')+'</div>'
-    +'<div class="heute" id="heuteBox"></div>'
-    +'<ul class="hinweise" id="heuteHinweise" style="margin-top:12px"></ul></div>';
-
-  html+='<div class="aktionen noprint"><a class="gross-link" href="#/info">INFO — Monatsübersicht</a></div>';
+  html+='<a class="cta rollin noprint" href="#/info">'
+    +'<span class="cta-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9.5h18M8.5 2.5v3.5M15.5 2.5v3.5M7 13.5h4M7 17h7"/></svg></span>'
+    +'<span class="cta-txt"><strong>Monatsübersicht</strong><span>Alle Tage, Wochensummen, Druck und CSV</span></span>'
+    +'<span class="cta-pfeil">→</span></a>';
   html+='</div>';
   view.innerHTML=html;
 
@@ -1103,6 +1437,8 @@ function zeichneStempel(){
     (function(b){ b.addEventListener("click", function(){ buchen(b.getAttribute("data-akt"), b); }); })(tasten[i]);
   }
   tick();
+  revealInit();
+  rollInit();
 }
 
 function offenesIv(typ){
@@ -1196,10 +1532,20 @@ function tick(){
     seitTxt="Seit der letzten Buchung ("+fmtUhr(letzte)+"): "+Math.floor(sek/3600)+":"+pad2(Math.floor((sek%3600)/60))+":"+pad2(sek%60);
   }
   sk.setAttribute("data-z",z);
-  sk.innerHTML='<div class="zeile1"><span class="zustand"><i class="dot"></i>'+esc(zustand)+'</span>'
-    +'<span class="marker">'+(z===""?"aus":z==="arbeit"?"läuft":z==="pause"?"Pause":"unterwegs")+'</span>'
-    +'<span class="uhr">'+pad2(now.getHours())+":"+pad2(now.getMinutes())+":"+pad2(now.getSeconds())+'</span></div>'
-    +'<div class="seit">'+esc(seitTxt)+'</div>';
+  var setz=function(id,txt){ var el=document.getElementById(id); if(el && el.textContent!==txt) el.textContent=txt; };
+  setz("zustandTxt",zustand);
+  setz("uhrTxt", pad2(now.getHours())+":"+pad2(now.getMinutes())+":"+pad2(now.getSeconds()));
+  setz("seitTxt", seitTxt);
+
+  /* Fortschrittsring: Tages-Ist im Verhaeltnis zum Soll (Umfang 2*PI*52 = 326,7) */
+  var rf=document.getElementById("ringFill");
+  if(rf){
+    var pct = r.soll>0 ? Math.min(1, r.ist/r.soll) : (r.ist>0?1:0);
+    rf.style.strokeDashoffset = String(326.7*(1-pct));
+    rf.classList.toggle("voll", r.soll>0 && r.ist>=r.soll);
+    setz("ringPct", Math.round(pct*100)+"%");
+    setz("ringSub", r.soll>0 ? (r.ist>=r.soll?"Soll erreicht":"vom Tagessoll") : "kein Soll heute");
+  }
 
   var kn=document.querySelector('[data-akt="kommen"]');
   if(kn){
@@ -1214,21 +1560,24 @@ function tick(){
     ge.title = ge.disabled ? (oA<0?"Zuerst „Kommen“ buchen.":"Zuerst Pause bzw. Dienstgang beenden.") : "";
     pa.title = pa.disabled ? (oA<0?"Pause erst nach „Kommen“ möglich.":"Zuerst den Dienstgang beenden.") : "";
     dg.title = dg.disabled ? "Zuerst die Pause beenden." : "";
-    document.getElementById("pauseTxt").textContent = oP>=0?"PAUSE BEENDEN":"PAUSE";
-    document.getElementById("dgTxt").textContent = oD>=0?"DIENSTGANG BEENDEN":"DIENSTGANG";
+    document.getElementById("pauseTxt").textContent = oP>=0?"Pause beenden":"Pause";
+    document.getElementById("dgTxt").textContent = oD>=0?"Dienstgang beenden":"Dienstgang";
   }
 
   var hb=document.getElementById("heuteBox");
   if(hb){
     var rest=r.soll-r.ist, fa=feierabend(hk);
-    hb.innerHTML=
+    var neu=
        '<div><div class="k">Bisher gearbeitet</div><div class="v">'+fmtDauer(r.ist)+' h</div></div>'
       +'<div><div class="k">Pause bisher</div><div class="v">'+fmtDauer(r.gebuchtePause)+' h</div></div>'
       +'<div><div class="k">Bis Tagessoll</div><div class="v">'+(rest>0?fmtDauer(rest)+" h":"erfüllt")+'</div></div>'
       +'<div><div class="k">Rechn. Feierabend</div><div class="v">'+(rest<=0?"erreicht":(fa!==null?fmtUhr(fa):"—"))+'</div></div>';
-    document.getElementById("heuteHinweise").innerHTML = r.warnungen.length
+    if(hb.getAttribute("data-h")!==neu){ hb.innerHTML=neu; hb.setAttribute("data-h",neu); }
+    var hh=document.getElementById("heuteHinweise");
+    var neuH = r.warnungen.length
       ? r.warnungen.map(function(x){ return '<li class="'+(x.typ==="warn"?"w":"i")+'"><span class="sym">'+(x.typ==="warn"?"!":"i")+'</span><span>'+esc(x.text)+'</span></li>'; }).join("")
       : '<li class="i"><span class="sym">✓</span><span>Keine Hinweise für heute.</span></li>';
+    if(hh.getAttribute("data-h")!==neuH){ hh.innerHTML=neuH; hh.setAttribute("data-h",neuH); }
   }
 }
 
@@ -1237,31 +1586,40 @@ function zeichneInfo(){
   var h='<div id="druckkopf">'
     +'<div class="dtitel">Zeitnachweis '+esc(MONATE[ansicht.monat])+' '+ansicht.jahr+'</div>'
     +'<div class="dzeile">'+(E().name?esc(E().name)+' · ':'')+'Private Parallelaufzeichnung · gedruckt am '+esc(fmtDatum(heuteKey()))+'</div></div>';
-  h+='<div class="reiter noprint">'
+  h+='<div class="infokopf noprint"><div class="reiter" id="reiterBox" data-pos="'+(ansicht.reiter==="jahr"?"1":"0")+'"><span class="glider"></span>'
     +'<button data-reiter="monat" class="'+(ansicht.reiter==="monat"?"aktiv":"")+'">Monat</button>'
-    +'<button data-reiter="jahr" class="'+(ansicht.reiter==="jahr"?"aktiv":"")+'">Jahr</button></div>';
+    +'<button data-reiter="jahr" class="'+(ansicht.reiter==="jahr"?"aktiv":"")+'">Jahr</button></div></div>';
   h+='<div id="infoInhalt"></div>';
   view.innerHTML=h;
   var rs=view.querySelectorAll("[data-reiter]");
   for(var i=0;i<rs.length;i++)
-    (function(b){ b.addEventListener("click", function(){ ansicht.reiter=b.getAttribute("data-reiter"); zeichneInfo(); }); })(rs[i]);
+    (function(b){ b.addEventListener("click", function(){
+      var ziel=b.getAttribute("data-reiter");
+      if(ansicht.reiter===ziel) return;
+      ansicht.reiter=ziel;
+      document.getElementById("reiterBox").setAttribute("data-pos", ziel==="jahr"?"1":"0");
+      for(var k=0;k<rs.length;k++) rs[k].classList.toggle("aktiv", rs[k]===b);
+      ansicht._frisch=true;
+      if(ziel==="monat") zeichneMonat(); else zeichneJahr();
+    }); })(rs[i]);
   if(ansicht.reiter==="monat") zeichneMonat(); else zeichneJahr();
 }
 
-function kachel(k,v,cls){
+function kachel(k,v,cls,min,fmt){
   var tint = cls==="p" ? " kp" : cls==="m" ? " km" : "";
-  return '<div class="kachel'+tint+'"><div class="k">'+esc(k)+'</div><div class="v '+cls+'">'+esc(v)+'</div></div>';
+  var dat = (min===undefined) ? "" : ' data-min="'+min+'" data-fmt="'+(fmt||"dauer")+'"';
+  return '<div class="kachel'+tint+'"><div class="k">'+esc(k)+'</div><div class="v '+cls+'"'+dat+'>'+esc(v)+'</div></div>';
 }
 function kachelnHtml(b,kEnde){
-  return kachel("Soll"+(b.kuenftig?" bis heute":""), fmtDauer(b.soll)+" h","")
-   +kachel("Ist", fmtDauer(b.ist)+" h","")
-   +kachel("Saldo", fmtSaldo(b.saldo)+" h", b.saldo>0?"p":b.saldo<0?"m":"")
-   +kachel("Konto Ende", fmtSaldo(kEnde)+" h", kEnde>0?"p":kEnde<0?"m":"")
+  return kachel("Soll"+(b.kuenftig?" bis heute":""), fmtDauer(b.soll)+" h","",b.soll,"dauer")
+   +kachel("Ist", fmtDauer(b.ist)+" h","",b.ist,"dauer")
+   +kachel("Saldo", fmtSaldo(b.saldo)+" h", b.saldo>0?"p":b.saldo<0?"m":"", b.saldo,"saldo")
+   +kachel("Konto Ende", fmtSaldo(kEnde)+" h", kEnde>0?"p":kEnde<0?"m":"", kEnde,"saldo")
    +kachel("Urlaub", zahl(b.urlaub)+" Tg.","")
    +kachel("Krank", zahl(b.krank)+" Tg.","")
    +kachel("Gleittage", zahl(b.gleit)+" Tg.","")
-   +kachel("Dienstgänge", fmtDauer(b.dienstgang)+" h","")
-   +kachel("Pausen", fmtDauer(b.pause)+" h","");
+   +kachel("Dienstgänge", fmtDauer(b.dienstgang)+" h","",b.dienstgang,"dauer")
+   +kachel("Pausen", fmtDauer(b.pause)+" h","",b.pause,"dauer");
 }
 function zahl(n){ return (n%1)? String(n).replace(".",",") : String(n); }
 function letzterTagKey(){ return ansicht.jahr+"-"+pad2(ansicht.monat+1)+"-"+pad2(tageImMonat(ansicht.jahr,ansicht.monat)); }
@@ -1270,24 +1628,28 @@ function zeichneMonat(){
   var b=monatsBilanz(ansicht.jahr,ansicht.monat);
   var kEnde=kontostandBis(letzterTagKey());
 
-  var h='<div class="monatsleiste noprint">'
-   +'<button class="btn" id="mPrev" aria-label="Vorheriger Monat">‹</button>'
+  var fx=ansicht._frisch?"reveal":"reveal in"; var frisch=!!ansicht._frisch; ansicht._frisch=false;
+  var waLive=document.getElementById("warnAcc"); if(waLive) ansicht.warnAuf=waLive.open;
+  var leLive=document.getElementById("legendeAcc"); if(leLive) ansicht.legendeAuf=leLive.open;
+  var h='<div class="monatsleiste noprint '+fx+'">'
+   +'<div class="mnav"><button class="btn rund" id="mPrev" aria-label="Vorheriger Monat">‹</button>'
    +'<div class="titel">'+esc(MONATE[ansicht.monat])+' '+ansicht.jahr+'</div>'
-   +'<button class="btn" id="mNext" aria-label="Nächster Monat">›</button>'
-   +'<button class="btn" id="mHeute">Aktueller Monat</button>'
+   +'<button class="btn rund" id="mNext" aria-label="Nächster Monat">›</button></div>'
+   +'<button class="btn" id="mHeute">Heute</button>'
    +'<select id="mSel" style="width:auto;min-width:132px" aria-label="Monat">'
      +MONATE.map(function(n,i){return '<option value="'+i+'"'+(i===ansicht.monat?' selected':'')+'>'+n+'</option>';}).join("")
    +'</select>'
    +'<input type="number" id="jSel" value="'+ansicht.jahr+'" style="width:104px" step="1" aria-label="Jahr">'
-   +'<button class="btn" id="btnDruck" style="margin-left:auto">Drucken / PDF</button>'
+   +'<span class="fluss"></span>'
+   +'<button class="btn prim" id="btnDruck">Drucken / PDF</button>'
    +'<button class="btn" id="btnCsv">CSV</button></div>';
 
-  h+='<div class="kacheln">'+kachelnHtml(b,kEnde)+'</div>';
+  h+='<div class="kacheln '+fx+'" style="--d:40ms">'+kachelnHtml(b,kEnde)+'</div>';
 
   var kw=kontoWarnungen();
-  h+='<div id="warnBox">'+warnHtml(b,kw)+'</div>';
+  h+='<div id="warnBox" class="'+fx+'" style="--d:70ms">'+warnHtml(b,kw)+'</div>';
 
-  h+='<div class="tabwrap"><table class="monat"><thead><tr>'
+  h+='<div class="tabwrap '+fx+'" style="--d:90ms"><table class="monat"><thead><tr>'
    +'<th>Datum</th><th>Tag</th><th>Art</th><th>Kommen</th><th>Gehen</th>'
    +'<th>Pause</th><th class="r">Pause h</th><th>Dienstgang</th><th class="r">Dg. h</th>'
    +'<th class="r">Brutto</th><th class="r">Abzug</th><th class="r">Ist</th><th class="r">Soll</th><th class="r">Saldo</th><th>Notiz</th>'
@@ -1297,32 +1659,63 @@ function zeichneMonat(){
     h+=wochenZeile(bl);
   });
   h+='</tbody></table></div>';
-  h+='<div class="legende noprint" style="margin-bottom:6px">'
+  h+='<details class="acc klein noprint" id="legendeAcc"'+(ansicht.legendeAuf?' open':'')+' style="margin-top:12px"><summary>Legende und Zeichen<span class="chev"></span></summary><div class="acc-body">'
+   +'<div class="legende" style="margin-top:0">'
    +'<span class="farbchip" style="background:var(--z-gruen)"></span>Tagessoll erfüllt&nbsp;&nbsp;'
    +'<span class="farbchip" style="background:var(--z-rot)"></span>Tagessoll unterschritten&nbsp;&nbsp;'
    +'<span class="farbchip" style="background:var(--z-gelb)"></span>Urlaub, Krank, Feiertag, Gleittag&nbsp;&nbsp;'
    +'<span class="farbchip" style="background:var(--z-blau)"></span>Wochenende'
-   +'</div>';
-  h+='<div class="legende noprint">Berechnete Werte stehen in gedämpfter Schrift. <span class="stift">✎</span> = manuell gesetzte Tagesart, '
+   +'</div>'
+   +'<div class="legende">Berechnete Werte stehen in gedämpfter Schrift. <span class="stift">✎</span> = manuell gesetzte Tagesart, '
    +'<span class="mark" style="vertical-align:baseline">K</span> = Zeitkorrektur aus „Sonstige Ergänzungen“, '
    +'<span class="mark" style="vertical-align:baseline">P</span> = private Unterbrechung, '
    +'<span class="mark" style="vertical-align:baseline">▲</span> = gekappte Minuten, '
-   +'<span class="mark" style="vertical-align:baseline">!</span> = Warnung. Ein Klick auf Art oder Notiz öffnet das Tagesdetail.</div>';
+   +'<span class="mark" style="vertical-align:baseline">!</span> = Warnung. Ein Klick auf Art oder Notiz öffnet das Tagesdetail.</div>'
+   +'</div></details>';
   h+='<div class="unterschrift"><span>Datum, Unterschrift</span><span>Monatssaldo '+fmtSaldo(b.saldo)+' h · Kontostand '+fmtSaldo(kEnde)+' h</span></div>';
 
   document.getElementById("infoInhalt").innerHTML=h;
+  /* Druckkopf-Titel mitziehen — sonst druckt ein spaeter gewaehlter Monat den alten Titel */
+  var dk=document.querySelector("#druckkopf .dtitel");
+  if(dk) dk.textContent="Zeitnachweis "+MONATE[ansicht.monat]+" "+ansicht.jahr;
   monatEvents();
+  revealInit();
+  if(frisch){
+  animKacheln();
+  /* Zeilen gestaffelt einblenden */
+  var trs=document.querySelectorAll("#tbody tr");
+  for(var z2=0;z2<trs.length;z2++) trs[z2].style.setProperty("--i",z2);
+  var mt=document.querySelector("table.monat");
+  if(mt) mt.classList.add("rows-in");
+  /* Im aktuellen Monat sanft zur heutigen Zeile scrollen */
+  var jetzt=new Date();
+  if(ansicht.jahr===jetzt.getFullYear() && ansicht.monat===jetzt.getMonth()){
+    window.setTimeout(function(){
+      var wrap=document.querySelector(".tabwrap"), zeileHeute=document.querySelector("tr.tag-heute");
+      if(wrap && zeileHeute && wrap.scrollHeight>wrap.clientHeight){
+        var ziel=Math.max(0, zeileHeute.offsetTop - wrap.clientHeight/2);
+        if(reduzierteBewegung() || !wrap.scrollTo) wrap.scrollTop=ziel;
+        else wrap.scrollTo({top:ziel,behavior:"smooth"});
+      }
+    },450);
+  }
+  }
 }
 function warnHtml(b,kw){
   if(!b.warnungen.length && !kw.length) return "";
-  var h='<div class="karte pad" style="margin-bottom:14px"><div class="label">Hinweise und Warnungen ('+(b.warnungen.length+kw.length)+')</div><ul class="hinweise">';
+  var n=b.warnungen.length+kw.length;
+  var ernst = kw.length>0 || b.warnungen.some(function(x){return x.typ==="warn";});
+  var auf = ansicht.warnAuf===undefined ? ernst : ansicht.warnAuf;
+  var h='<details class="acc'+(ernst?' acc-warn':'')+'" id="warnAcc"'+(auf?' open':'')+' style="margin-bottom:14px">'
+    +'<summary><span class="acc-ico">'+(ernst?"!":"i")+'</span>Hinweise und Warnungen'
+    +'<span class="zaehler">'+n+'</span><span class="chev"></span></summary><div class="acc-body"><ul class="hinweise">';
   kw.forEach(function(t){ h+='<li class="w"><span class="sym">!</span><span>'+esc(t)+'</span></li>'; });
   b.warnungen.forEach(function(x){
     h+='<li class="'+(x.typ==="warn"?"w":"i")+'"><span class="sym">'+(x.typ==="warn"?"!":"i")+'</span><span>'
       +(x.key?'<strong>'+esc(fmtDatumKurz(x.key))+'</strong> ':'')+esc(x.text)+'</span>'
       +(x.key?'<button class="noprint" data-spring="'+x.key+'">zum Tag</button>':'')+'</li>';
   });
-  return h+'</ul></div>';
+  return h+'</ul></div></details>';
 }
 /* Farbliche Kennzeichnung der Zeile.
    Reihenfolge zaehlt: Wochenende schlaegt alles, dann abwesende Tage, erst danach der Saldo. */
@@ -1399,7 +1792,7 @@ function artZelle(r,warnMark){
     +esc(r.feiertag||r.artName)+(r.artManuell?'<span class="stift">✎</span>':'')+(warnMark||'')+'</button>';
 }
 function notizZelle(key,t){
-  return '<button class="notizbtn" data-detail="'+key+'" title="Tagesdetail öffnen">'+(t.notiz?esc(t.notiz):'<span style="opacity:.45">+</span>')+'</button>';
+  return '<button class="notizbtn" data-detail="'+key+'" title="Tagesdetail öffnen">'+(t.notiz?esc(t.notiz):'<span class="n-leer">+ Notiz</span>')+'</button>';
 }
 function bruttoZelle(r){
   return (r.brutto?fmtDauer(r.brutto):"")
@@ -1436,11 +1829,12 @@ function saldoZelle(r,maxAbs){
 
 function monatEvents(){
   var g=function(id){ return document.getElementById(id); };
-  g("mPrev").addEventListener("click",function(){ ansicht.monat--; if(ansicht.monat<0){ansicht.monat=11;ansicht.jahr--;} zeichneMonat(); });
-  g("mNext").addEventListener("click",function(){ ansicht.monat++; if(ansicht.monat>11){ansicht.monat=0;ansicht.jahr++;} zeichneMonat(); });
-  g("mHeute").addEventListener("click",function(){ ansicht.jahr=new Date().getFullYear(); ansicht.monat=new Date().getMonth(); zeichneMonat(); });
-  g("mSel").addEventListener("change",function(){ ansicht.monat=+this.value; zeichneMonat(); });
-  g("jSel").addEventListener("change",function(){ var v=parseInt(this.value,10); if(v>1990&&v<2200){ansicht.jahr=v; zeichneMonat();} });
+  function neuMonat(){ ansicht._frisch=true; zeichneMonat(); }
+  g("mPrev").addEventListener("click",function(){ ansicht.monat--; if(ansicht.monat<0){ansicht.monat=11;ansicht.jahr--;} neuMonat(); });
+  g("mNext").addEventListener("click",function(){ ansicht.monat++; if(ansicht.monat>11){ansicht.monat=0;ansicht.jahr++;} neuMonat(); });
+  g("mHeute").addEventListener("click",function(){ ansicht.jahr=new Date().getFullYear(); ansicht.monat=new Date().getMonth(); neuMonat(); });
+  g("mSel").addEventListener("change",function(){ ansicht.monat=+this.value; neuMonat(); });
+  g("jSel").addEventListener("change",function(){ var v=parseInt(this.value,10); if(v>1990&&v<2200){ansicht.jahr=v; neuMonat();} });
   g("btnDruck").addEventListener("click",function(){ window.print(); });
   g("btnCsv").addEventListener("click",csvExport);
   springLinks();
@@ -1460,6 +1854,11 @@ function springLinks(){
   var xs=document.querySelectorAll("[data-spring]");
   for(var i=0;i<xs.length;i++)
     (function(x){ x.addEventListener("click",function(){ springeZu(x.getAttribute("data-spring")); }); })(xs[i]);
+  /* Aufklapp-Zustaende ueberleben das Neuzeichnen */
+  var wa=document.getElementById("warnAcc");
+  if(wa) wa.addEventListener("toggle",function(){ ansicht.warnAuf=wa.open; });
+  var la=document.getElementById("legendeAcc");
+  if(la) la.addEventListener("toggle",function(){ ansicht.legendeAuf=la.open; });
 }
 function springeZu(key){
   var jr=parseInt(key.slice(0,4),10), mo=parseInt(key.slice(5,7),10)-1;
@@ -1538,11 +1937,12 @@ function livePatch(key){
 /* ---------- Jahresansicht ---------- */
 function zeichneJahr(){
   var j=ansicht.jahr;
-  var h='<div class="monatsleiste noprint">'
-   +'<button class="btn" id="jPrev" aria-label="Vorjahr">‹</button>'
+  var fx=ansicht._frisch?"reveal":"reveal in"; ansicht._frisch=false;
+  var h='<div class="monatsleiste noprint '+fx+'">'
+   +'<div class="mnav"><button class="btn rund" id="jPrev" aria-label="Vorjahr">‹</button>'
    +'<div class="titel">Jahr '+j+'</div>'
-   +'<button class="btn" id="jNext" aria-label="Folgejahr">›</button></div>';
-  h+='<div class="karte pad"><table class="jahrtab"><thead><tr><th>Monat</th><th class="r">Soll</th><th class="r">Ist</th><th class="r">Saldo</th><th class="r">Kontostand Ende</th></tr></thead><tbody>';
+   +'<button class="btn rund" id="jNext" aria-label="Folgejahr">›</button></div></div>';
+  h+='<div class="karte pad '+fx+'" style="--d:50ms"><table class="jahrtab"><thead><tr><th>Monat</th><th class="r">Soll</th><th class="r">Ist</th><th class="r">Saldo</th><th class="r">Kontostand Ende</th></tr></thead><tbody>';
   var sSoll=0,sIst=0,sSaldo=0;
   for(var m=0;m<12;m++){
     var b=monatsBilanz(j,m);
@@ -1559,8 +1959,9 @@ function zeichneJahr(){
     +'<td class="r '+(sSaldo>0?"p":sSaldo<0?"m":"")+'">'+fmtSaldo(sSaldo)+'</td><td class="r">—</td></tr>';
   h+='</tbody></table><p class="hint">Kontostand = Anfangswert aus den Einstellungen zuzüglich aller Tagessalden ab dem Stichtag; künftige Tage bleiben unberücksichtigt.</p></div>';
   document.getElementById("infoInhalt").innerHTML=h;
-  document.getElementById("jPrev").addEventListener("click",function(){ ansicht.jahr--; zeichneJahr(); });
-  document.getElementById("jNext").addEventListener("click",function(){ ansicht.jahr++; zeichneJahr(); });
+  revealInit();
+  document.getElementById("jPrev").addEventListener("click",function(){ ansicht.jahr--; ansicht._frisch=true; zeichneJahr(); });
+  document.getElementById("jNext").addEventListener("click",function(){ ansicht.jahr++; ansicht._frisch=true; zeichneJahr(); });
   var ms=document.querySelectorAll("[data-monat]");
   for(var i=0;i<ms.length;i++)
     (function(a){ a.addEventListener("click",function(){ ansicht.monat=+a.getAttribute("data-monat"); ansicht.reiter="monat"; zeichneInfo(); }); })(ms[i]);
@@ -1602,7 +2003,7 @@ function detailZeichnen(){
   var key=detailKey; if(!key) return;
   var r=tagRechnung(key);
   var t=state.tage[key]||{intervalle:[],korrekturen:[],notiz:""};
-  var h='<div class="dkopf">'
+  var h='<div class="griff" aria-hidden="true"></div><div class="dkopf">'
    +'<div><div class="dt">'+esc(WT_LANG[r.dow])+', '+esc(fmtDatum(key))+'</div>'
    +'<div class="ds">'+(r.feiertag?esc(r.feiertag)+' · ':'')+'Tagessoll '+fmtDauer(r.tagessoll)+' h</div></div>'
    +'<button class="iconbtn" id="dClose" style="margin-left:auto" aria-label="Schließen">✕</button></div><div class="dbody">';
@@ -1643,9 +2044,9 @@ function detailZeichnen(){
    +(r.privat?rz("private Unterbrechungen (−)", "−"+fmtDauer(r.privat)+" h"):"")
    +rz("<strong>Brutto-Anwesenheit</strong>", "<strong>"+fmtDauer(r.brutto)+" h</strong>")
    +(r.pauseAutomatisch
-      ? rz("Mindestpause § 4 ArbZG — automatisch abgezogen, da keine Pause gestempelt", fmtDauer(r.pflichtPause)+" h","zwi")
+      ? rz("Mindestpause — automatisch abgezogen, da keine Pause gestempelt", fmtDauer(r.pflichtPause)+" h","zwi")
       : rz("gestempelte Pause", fmtDauer(r.gebuchtePause)+" h","zwi")
-        +rz("Mindestpause nach § 4 ArbZG", fmtDauer(r.pflichtPause)+" h","zwi"))
+        +rz("Mindestpause", fmtDauer(r.pflichtPause)+" h","zwi"))
    +(r.zuschlag?rz("Verspätungszuschlag ("+esc(r.zuschlagInfo)+")", "+"+fmtDauer(r.zuschlag)+" h","zwi"):"")
    +rz("<strong>Pausenabzug gesamt (−)</strong>", "<strong>−"+fmtDauer(r.abzug)+" h</strong>")
    +(r.gekappt?rz("über "+fmtDauer(E().kappung)+" h gekappt (−)", "−"+fmtDauer(r.gekappt)+" h"):"")
@@ -1745,27 +2146,44 @@ function feldKurz(id,label,wert,sub){
   return '<div class="feld" style="flex:1;min-width:158px"><label for="'+id+'">'+esc(label)+'</label>'
     +'<input type="text" id="'+id+'" value="'+esc(wert)+'"><div class="sub">'+esc(sub)+'</div></div>';
 }
+var ICO={
+  uhr:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>',
+  rahmen:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9.5h18M8.5 2.5v3.5M15.5 2.5v3.5"/></svg>',
+  pausen:'<svg viewBox="0 0 24 24"><path d="M5 8.5h11v5.5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 9.5h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M7.5 4v2M10.5 4v2M13.5 4v2"/></svg>',
+  konto:'<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10.5h18M7 15h4"/></svg>',
+  allg:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a13.5 13.5 0 0 1 0 18M12 3a13.5 13.5 0 0 0 0 18"/></svg>',
+  daten:'<svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path d="M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg>'
+};
 function zeichneEinstellungen(){
   var e=E();
-  var h='<div class="eng"><h1>Einstellungen</h1><p class="hint">Alle Rechenwerte stehen hier — nichts ist fest im Code verdrahtet. Änderungen wirken sofort auf alle Monate.</p>';
+  var offen=ansicht.einstOffen;
+  /* Live-Zustand einlesen — das toggle-Event allein feuert asynchron und kann zu spaet kommen */
+  var live=document.querySelectorAll("details.sekt");
+  for(var li=0;li<live.length;li++) offen[live[li].getAttribute("data-sekt")]=live[li].open;
+  function sk(id,ico,titel,fazit,inhalt){
+    return '<details class="karte acc sekt" data-sekt="'+id+'"'+(offen[id]?" open":"")+'>'
+      +'<summary><span class="acc-ico">'+ico+'</span><span class="acc-titel">'+esc(titel)
+      +'<small>'+esc(fazit)+'</small></span><span class="chev"></span></summary>'
+      +'<div class="acc-body">'+inhalt+'</div></details>';
+  }
 
-  h+='<div class="karte pad" style="margin-top:16px"><h2 style="margin-top:0">Soll-Arbeitszeit</h2>'
-   +'<div class="feld"><label>Regelmäßige Wochenarbeitszeit</label><div class="chips">'
+  /* --- Soll-Arbeitszeit --- */
+  var b1='<div class="feld"><label>Regelmäßige Wochenarbeitszeit</label><div class="chips">'
    +chip("waz","2400","40:00 h (Beamte)",e.wochenarbeitszeit===2400)
    +chip("waz","2340","39:00 h (Tarif)",e.wochenarbeitszeit===2340)
    +chip("waz","frei","Freiwert",e.wochenarbeitszeit!==2400&&e.wochenarbeitszeit!==2340)
    +'</div><div class="reihe" style="margin-top:8px"><input type="text" class="kurz" id="wazFrei" value="'+fmtDauer(e.wochenarbeitszeit)+'" aria-label="Wochenarbeitszeit"><span class="sub">Format H:MM</span></div></div>';
-  h+='<div class="feld"><label>Arbeitstage</label><div class="chips">';
+  b1+='<div class="feld"><label>Arbeitstage</label><div class="chips">';
   [1,2,3,4,5,6,0].forEach(function(i){
-    h+='<label class="chip '+(e.arbeitstage[i]?"an":"")+'"><input type="checkbox" data-at="'+i+'"'+(e.arbeitstage[i]?" checked":"")+'>'+WT_KURZ[i]+'</label>';
+    b1+='<label class="chip '+(e.arbeitstage[i]?"an":"")+'"><input type="checkbox" data-at="'+i+'"'+(e.arbeitstage[i]?" checked":"")+'>'+WT_KURZ[i]+'</label>';
   });
-  h+='</div></div>';
-  h+='<div class="feld"><label class="schalter"><input type="checkbox" id="tsAuto"'+(e.tagessollAuto?" checked":"")+'>Tagessoll automatisch (Wochenarbeitszeit ÷ Anzahl Arbeitstage)</label>'
+  b1+='</div></div>';
+  b1+='<div class="feld"><label class="schalter"><input type="checkbox" id="tsAuto"'+(e.tagessollAuto?" checked":"")+'>Tagessoll automatisch (Wochenarbeitszeit ÷ Anzahl Arbeitstage)</label>'
    +'<div class="reihe"><input type="text" class="kurz" id="tsWert" value="'+fmtDauer(tagessollBerechnet(e))+'"'+(e.tagessollAuto?" disabled":"")+' aria-label="Tagessoll">'
-   +'<span class="sub">Aktuelles Tagessoll: <strong>'+fmtDauer(tagessollBerechnet(e))+' h</strong></span></div></div></div>';
+   +'<span class="sub">Aktuelles Tagessoll: <strong>'+fmtDauer(tagessollBerechnet(e))+' h</strong></span></div></div>';
 
-  h+='<div class="karte pad" style="margin-top:14px"><h2 style="margin-top:0">Rahmen- und Kernarbeitszeit</h2>'
-   +'<div class="feld"><label class="schalter"><input type="checkbox" id="rahmenAn"'+(e.rahmenPruefung?" checked":"")+'>Rahmenzeit prüfen</label>'
+  /* --- Rahmen- und Kernarbeitszeit --- */
+  var b2='<div class="feld"><label class="schalter"><input type="checkbox" id="rahmenAn"'+(e.rahmenPruefung?" checked":"")+'>Rahmenzeit prüfen</label>'
    +'<div class="reihe"><input type="text" class="kurz" id="rahmenVon" value="'+esc(e.rahmenVon)+'" aria-label="Rahmenzeit von"><span class="sub">bis</span>'
    +'<input type="text" class="kurz" id="rahmenBis" value="'+esc(e.rahmenBis)+'" aria-label="Rahmenzeit bis"></div>'
    +'<div class="sub">Buchungen außerhalb sind erlaubt und werden nur als Hinweis markiert. Feiertage bleiben ausgenommen.</div></div>'
@@ -1773,30 +2191,29 @@ function zeichneEinstellungen(){
    +'<div class="sub">Standardmäßig <strong>aus</strong> — es kommt keine Meldung, wenn du außerhalb der Kernzeit stempelst oder vor ihrem Ende gehst. Eingeschaltet erscheint lediglich ein Hinweis; korrigiert wird nie etwas.</div></div>';
   [1,2,3,4,5,6,0].forEach(function(i){
     var bl=(e.kernzeiten[String(i)]||[]);
-    h+='<div class="kernblock"><div class="wt">'+WT_LANG[i]+'</div>';
-    if(!bl.length) h+='<p class="hint" style="margin:0 0 6px">Keine Kernzeit.</p>';
+    b2+='<div class="kernblock"><div class="wt">'+WT_LANG[i]+'</div>';
+    if(!bl.length) b2+='<p class="hint" style="margin:0 0 6px">Keine Kernzeit.</p>';
     bl.forEach(function(b,j){
-      h+='<div class="ivzeile" style="margin-bottom:6px">'
+      b2+='<div class="ivzeile" style="margin-bottom:6px">'
        +'<input class="t" type="text" data-kern="'+i+'" data-j="'+j+'" data-teil="von" value="'+esc(b.von)+'" aria-label="Kernzeit von">'
        +'<span class="bis">bis</span>'
        +'<input class="t" type="text" data-kern="'+i+'" data-j="'+j+'" data-teil="bis" value="'+esc(b.bis)+'" aria-label="Kernzeit bis">'
        +'<button class="del" data-kerndel="'+i+'" data-j="'+j+'" aria-label="Block löschen">✕</button></div>';
     });
-    h+='<button class="addbtn" data-kernadd="'+i+'">+ Block</button></div>';
+    b2+='<button class="addbtn" data-kernadd="'+i+'">+ Block</button></div>';
   });
-  h+='</div>';
 
-  h+='<div class="karte pad" style="margin-top:14px"><h2 style="margin-top:0">Pausen und Grenzen</h2>'
-   +'<div class="feld"><label>Pausenstufen (§ 4 ArbZG)</label>';
+  /* --- Pausen und Grenzen --- */
+  var b3='<div class="feld"><label>Pausenstufen</label>';
   e.pausenstufen.forEach(function(s,i){
-    h+='<div class="ivzeile" style="margin-bottom:6px"><span class="sub" style="white-space:nowrap;margin:0">über</span>'
+    b3+='<div class="ivzeile" style="margin-bottom:6px"><span class="sub" style="white-space:nowrap;margin:0">über</span>'
      +'<input class="t" type="text" data-stufe="'+i+'" data-teil="grenze" value="'+fmtDauer(s.grenze)+'" aria-label="Grenze">'
      +'<span class="sub" style="white-space:nowrap;margin:0">h →</span>'
      +'<input class="z" type="text" data-stufe="'+i+'" data-teil="pause" value="'+s.pause+'" aria-label="Pause in Minuten">'
      +'<span class="sub" style="margin:0">min</span>'
      +'<button class="del" data-stufedel="'+i+'" aria-label="Stufe löschen">✕</button></div>';
   });
-  h+='<button class="addbtn" id="stufeAdd">+ Stufe</button></div>'
+  b3+='<button class="addbtn" id="stufeAdd">+ Stufe</button></div>'
    +'<div class="feld"><label class="schalter"><input type="checkbox" id="vzAn"'+(e.verspaetungszuschlag?" checked":"")+'>Verspätungszuschlag anwenden</label>'
    +'<div class="sub">Wird die Pause erst nach dem Überschreiten der 6-Stunden-Grenze angetreten, wird die Zeit zwischen Grenze und Pausenantritt zusätzlich abgezogen. Für die 9-Stunden-Grenze gilt das sinngemäß; angesetzt wird der größere der beiden Zuschläge, nicht deren Summe.</div></div>'
    +'<div class="feld"><label class="schalter"><input type="checkbox" id="kappAn"'+(e.kappungAn?" checked":"")+'>Arbeitszeit an der Tagesgrenze kappen</label>'
@@ -1808,24 +2225,26 @@ function zeichneEinstellungen(){
    +'</div><div class="reihe">'
    +feldKurz("kontoMinus","Grenze Zeitschuld",fmtDauer(e.kontoMinus),"H:MM · nur Warnung")
    +feldKurz("kontoPlus","Grenze Zeitguthaben",fmtDauer(e.kontoPlus),"H:MM · nur Warnung")
-   +'</div></div>';
+   +'</div>';
 
-  h+='<div class="karte pad" style="margin-top:14px"><h2 style="margin-top:0">Zeitkonto</h2><div class="reihe">'
+  /* --- Zeitkonto --- */
+  var b4='<div class="reihe">'
    +feldKurz("startKonto","Anfangs-Kontostand",fmtSaldo(e.startKonto),"z. B. +12:30 oder −3:15")
    +'<div class="feld" style="flex:1;min-width:190px"><label for="stichtag">Stichtag</label><input type="date" id="stichtag" value="'+esc(e.stichtag)+'"></div></div>'
    +'<p class="hint">Der Kontostand ist der Anfangswert zuzüglich aller Tagessalden ab dem Stichtag. Tage vor dem Stichtag zählen nicht ins Konto. Ohne Stichtag bleibt das Konto beim Anfangswert stehen.</p>'
-   +'<p class="hint" style="margin-top:8px"><strong>Aktueller Kontostand: '+fmtSaldo(kontostandBis(heuteKey()))+' h</strong></p></div>';
+   +'<p class="hint" style="margin-top:8px"><strong>Aktueller Kontostand: '+fmtSaldo(kontostandBis(heuteKey()))+' h</strong></p>';
 
-  h+='<div class="karte pad" style="margin-top:14px"><h2 style="margin-top:0">Allgemein</h2>'
-   +'<div class="feld"><label for="land">Bundesland (Feiertage)</label><select id="land">'
+  /* --- Allgemein --- */
+  var b5='<div class="feld"><label for="land">Bundesland (Feiertage)</label><select id="land">'
    +Object.keys(LAENDER).map(function(k){return '<option value="'+k+'"'+(k===e.land?" selected":"")+'>'+LAENDER[k]+'</option>';}).join("")
    +'</select><div class="sub">Die beweglichen Feiertage werden über die Gauß’sche Osterformel für jedes Jahr berechnet.</div></div>'
-   +'<div class="feld"><label for="nameF">Name (für den Ausdruck)</label><input type="text" id="nameF" value="'+esc(e.name)+'" placeholder="Vorname Nachname"></div>'
+   +'<div class="feld"><label for="nameF">Name (für Begrüßung und Ausdruck)</label><input type="text" id="nameF" value="'+esc(e.name)+'" placeholder="Vorname Nachname"></div>'
    +'<div class="feld"><label>Darstellung</label><div class="chips">'
    +chip("theme","auto","Automatisch",e.theme==="auto")+chip("theme","hell","Hell",e.theme==="hell")+chip("theme","dunkel","Dunkel",e.theme==="dunkel")
-   +'</div></div></div>';
+   +'</div></div>';
 
-  h+='<div class="karte pad" style="margin-top:14px"><h2 style="margin-top:0">Daten</h2><div class="knopfreihe">'
+  /* --- Daten --- */
+  var b6='<div class="knopfreihe">'
    +'<button class="btn" id="expJson">Export JSON (Sicherung)</button>'
    +'<button class="btn" id="impJson">Import JSON</button>'
    +'<button class="btn" id="expCsv">Export CSV (Monat)</button>'
@@ -1834,16 +2253,36 @@ function zeichneEinstellungen(){
    +'<div id="impVorschau"></div><div class="trenner"></div>'
    +'<button class="btn gefahr" id="loeschAlles">Alle Daten löschen</button>'
    +'<p class="hint">Die Daten liegen ausschließlich in diesem Browser (localStorage, Schlüssel <code>zeiterfassung.v1</code>). Wird die Datei oder ihr Link weitergegeben, startet die App beim Empfänger mit leerem, eigenem Bestand.</p>'
-   +'<p class="hint">Gespeicherte Tage: '+Object.keys(state.tage).length+'</p></div></div>';
+   +'<p class="hint">Gespeicherte Tage: '+Object.keys(state.tage).length+'</p>';
+
+  var pausenFazit=e.pausenstufen.slice().sort(function(a,b){return a.grenze-b.grenze;})
+    .map(function(s){return "ab "+fmtDauer(s.grenze)+" h → "+s.pause+" min";}).join(" · ");
+  var fx=ansicht._frisch?"reveal":"reveal in"; ansicht._frisch=false;
+  var h='<div class="eng"><div class="gruss '+fx+'"><h1>Einstellungen</h1>'
+   +'<p class="hint">Alles Wichtige auf einen Blick — zum Bearbeiten eine Karte aufklappen. Änderungen wirken sofort auf alle Monate.</p></div>'
+   +'<div class="sektliste '+fx+'" style="--d:60ms">'
+   +sk("soll",ICO.uhr,"Soll-Arbeitszeit",fmtDauer(e.wochenarbeitszeit)+" h/Woche · Tagessoll "+fmtDauer(tagessollBerechnet(e))+" h",b1)
+   +sk("rahmen",ICO.rahmen,"Rahmen- und Kernarbeitszeit",(e.rahmenPruefung?("Rahmen "+e.rahmenVon+"–"+e.rahmenBis):"Rahmenprüfung aus")+(e.kernzeitPruefung?" · Kernzeit an":" · Kernzeit aus"),b2)
+   +sk("pausen",ICO.pausen,"Pausen und Grenzen",pausenFazit,b3)
+   +sk("konto",ICO.konto,"Zeitkonto","Stand "+fmtSaldo(kontostandBis(heuteKey()))+" h"+(e.stichtag?" · zählt ab "+fmtDatum(e.stichtag):" · kein Stichtag"),b4)
+   +sk("allg",ICO.allg,"Allgemein",LAENDER[e.land]+" · "+(e.theme==="auto"?"Darstellung automatisch":e.theme==="hell"?"Hell":"Dunkel"),b5)
+   +sk("daten",ICO.daten,"Daten und Sicherung",(Object.keys(state.tage).length===1?"1 gespeicherter Tag":Object.keys(state.tage).length+" gespeicherte Tage"),b6)
+   +'</div></div>';
 
   view.innerHTML=h;
   einstellungenEvents();
+  revealInit();
 }
 function einstellungenEvents(){
   var e=E();
   var g=function(id){ return document.getElementById(id); };
   var alle=function(sel,fn){ var xs=document.querySelectorAll(sel); for(var i=0;i<xs.length;i++) fn(xs[i]); };
   function fertig(neuzeichnen){ speichern(); themeAnwenden(); if(neuzeichnen!==false) zeichneEinstellungen(); }
+
+  /* Aufklapp-Zustand je Karte merken, damit das Neuzeichnen nichts zuklappt */
+  alle("details.sekt",function(d){
+    d.addEventListener("toggle",function(){ ansicht.einstOffen[d.getAttribute("data-sekt")]=d.open; });
+  });
 
   alle('input[name="waz"]',function(r){
     r.addEventListener("change",function(){ if(r.value!=="frei") e.wochenarbeitszeit=parseInt(r.value,10); fertig(); });
@@ -2008,7 +2447,7 @@ function themeAnwenden(){
   else document.documentElement.setAttribute("data-theme",t);
   var dunkel = t==="dunkel" || (t==="auto" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
   var mt=document.querySelector('meta[name="theme-color"]');
-  if(mt) mt.setAttribute("content", dunkel?"#010409":"#161b22");
+  if(mt) mt.setAttribute("content", dunkel?"#070b13":"#eef1f7");
 }
 document.getElementById("themeBtn").addEventListener("click",function(){
   var e=E();
@@ -2023,7 +2462,7 @@ function iconDataUrl(px){
     var c=document.createElement("canvas"); c.width=px; c.height=px;
     var x=c.getContext("2d"); if(!x) return null;
     var r=px*0.22;
-    x.fillStyle="#1f6feb";
+    x.fillStyle="#4f6ef7";
     x.beginPath();
     if(x.roundRect) x.roundRect(0,0,px,px,r);
     else { x.moveTo(r,0); x.arcTo(px,0,px,px,r); x.arcTo(px,px,0,px,r); x.arcTo(0,px,0,0,r); x.arcTo(0,0,px,0,r); }
@@ -2035,7 +2474,7 @@ function iconDataUrl(px){
   }catch(err){ return null; }
 }
 function pwaEinrichten(){
-  var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#1f4e79"/><circle cx="256" cy="256" r="148" fill="none" stroke="#fff" stroke-width="28"/><path d="M256 154v112l84 42" fill="none" stroke="#fff" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#4f6ef7"/><circle cx="256" cy="256" r="148" fill="none" stroke="#fff" stroke-width="28"/><path d="M256 154v112l84 42" fill="none" stroke="#fff" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var svgUrl="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);
   var icons=[{src:svgUrl,sizes:"any",type:"image/svg+xml",purpose:"any"}];
   var png512=iconDataUrl(512);
@@ -2044,7 +2483,7 @@ function pwaEinrichten(){
     name:"Zeiterfassung", short_name:"Zeiten",
     description:"Private Parallelaufzeichnung der Arbeitszeit",
     start_url:".", scope:".", display:"standalone", orientation:"any",
-    background_color:"#f4f6f8", theme_color:"#1f4e79", lang:"de", icons:icons
+    background_color:"#070b13", theme_color:"#4f6ef7", lang:"de", icons:icons
   };
   try{
     var blob=new Blob([JSON.stringify(manifest)],{type:"application/manifest+json"});
