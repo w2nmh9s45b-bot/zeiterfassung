@@ -706,8 +706,14 @@ function fmtUhr(min){
   var v=Math.round(min); if(v<0) v=0;
   return pad2(Math.floor(v/60))+":"+pad2(v%60);
 }
+/* Anzeigeformat: "dezimal" = Industriestunden wie die Stempeluhr im Amt
+   (eine Nachkommastelle, 0,1 h = 6 Minuten), "hmm" = klassisch Stunden:Minuten.
+   Gerechnet wird intern immer minutengenau — nur die Darstellung rundet. */
+var ZEITFORMAT="dezimal";
+function setzeZeitformat(f){ ZEITFORMAT = (f==="hmm") ? "hmm" : "dezimal"; }
 function fmtDauer(min){
   var a=Math.abs(Math.round(min||0));
+  if(ZEITFORMAT==="dezimal") return (a/60).toFixed(1).replace(".",",");
   return Math.floor(a/60)+":"+pad2(a%60);
 }
 function fmtSaldo(min){
@@ -716,10 +722,17 @@ function fmtSaldo(min){
 }
 function parseDauer(str){
   if(str===null||str===undefined) return null;
-  var s=String(str).trim().toLowerCase().replace(/h/g,"").replace(/\s+/g,"").replace(/[.,]/g,":");
+  var s=String(str).trim().toLowerCase().replace(/h/g,"").replace(/\s+/g,"");
+  if(ZEITFORMAT!=="dezimal") s=s.replace(/[.,]/g,":");
   if(!s) return null;
   var neg=false;
   if(s.charAt(0)==="-"||s.charAt(0)==="−"||s.charAt(0)==="+"){ neg=(s.charAt(0)!=="+"); s=s.slice(1); }
+  /* Dezimalstunden: "39,5" = 39 h 30 min. "39:30" bleibt daneben erlaubt. */
+  if(ZEITFORMAT==="dezimal" && /^[0-9]+[.,][0-9]{1,2}$/.test(s)){
+    var dz=Math.round(parseFloat(s.replace(",","."))*60);
+    return neg?-dz:dz;
+  }
+  if(ZEITFORMAT==="dezimal") s=s.replace(/[.,]/g,":");
   var h,m;
   if(s.indexOf(":")>=0){ var p=s.split(":"); h=parseInt(p[0]||"0",10); m=parseInt(p[1]||"0",10); }
   else if(/^\d+$/.test(s)){ h=parseInt(s,10); m=0; }
@@ -824,6 +837,7 @@ function standardEinstellungen(){
     stichtag: "",
     land: "RP",
     name: "",
+    zeitformat: "dezimal",   /* Anzeige wie die Stempeluhr im Amt; "hmm" = Stunden:Minuten */
     theme: "dunkel"   /* Startwert fuer neue Nutzer; gespeicherte Einstellungen bleiben unberuehrt */
   };
 }
@@ -1072,7 +1086,7 @@ function letztesEnde(tag){
 }
 
 if(typeof module!=="undefined" && module.exports){
-  module.exports={parseZeit:parseZeit,parseDauer:parseDauer,fmtUhr:fmtUhr,fmtDauer:fmtDauer,fmtSaldo:fmtSaldo,
+  module.exports={parseZeit:parseZeit,parseDauer:parseDauer,fmtUhr:fmtUhr,fmtDauer:fmtDauer,fmtSaldo:fmtSaldo,setzeZeitformat:setzeZeitformat,
     berechneTag:berechneTag,standardEinstellungen:standardEinstellungen,tagessollBerechnet:tagessollBerechnet,
     feiertage:feiertage,feiertagName:feiertagName,ostersonntag:ostersonntag,ARTEN:ARTEN,keyOf:keyOf,
     dateOf:dateOf,letztesEnde:letztesEnde,isoWocheKey:isoWocheKey,LAENDER:LAENDER};
@@ -2172,7 +2186,7 @@ function zeichneEinstellungen(){
    +chip("waz","2400","40:00 h (Beamte)",e.wochenarbeitszeit===2400)
    +chip("waz","2340","39:00 h (Tarif)",e.wochenarbeitszeit===2340)
    +chip("waz","frei","Freiwert",e.wochenarbeitszeit!==2400&&e.wochenarbeitszeit!==2340)
-   +'</div><div class="reihe" style="margin-top:8px"><input type="text" class="kurz" id="wazFrei" value="'+fmtDauer(e.wochenarbeitszeit)+'" aria-label="Wochenarbeitszeit"><span class="sub">Format H:MM</span></div></div>';
+   +'</div><div class="reihe" style="margin-top:8px"><input type="text" class="kurz" id="wazFrei" value="'+fmtDauer(e.wochenarbeitszeit)+'" aria-label="Wochenarbeitszeit"><span class="sub">'+(zfHmm?"Format H:MM, z. B. 39:30":"Dezimal, z. B. 39,5")+'</span></div></div>';
   b1+='<div class="feld"><label>Arbeitstage</label><div class="chips">';
   [1,2,3,4,5,6,0].forEach(function(i){
     b1+='<label class="chip '+(e.arbeitstage[i]?"an":"")+'"><input type="checkbox" data-at="'+i+'"'+(e.arbeitstage[i]?" checked":"")+'>'+WT_KURZ[i]+'</label>';
@@ -2219,23 +2233,28 @@ function zeichneEinstellungen(){
    +'<div class="feld"><label class="schalter"><input type="checkbox" id="kappAn"'+(e.kappungAn?" checked":"")+'>Arbeitszeit an der Tagesgrenze kappen</label>'
    +'<div class="sub">Standardmäßig <strong>aus</strong> — arbeitest du länger als die Grenze, wird die Zeit <strong>voll gutgeschrieben</strong> statt abgeschnitten. Eingeschaltet fällt alles darüber weg.</div></div>'
    +'<div class="reihe">'
-   +feldKurz("kappung","Tagesgrenze",fmtDauer(e.kappung),"H:MM · nur Hinweis, solange die Kappung aus ist")
-   +feldKurz("maxWoche","Warngrenze Woche",fmtDauer(e.maxWoche),"H:MM · nur Warnung")
-   +feldKurz("ruhezeit","Mindestruhezeit",fmtDauer(e.ruhezeit),"H:MM · nur Warnung")
+   +feldKurz("kappung","Tagesgrenze",fmtDauer(e.kappung),(zfHmm?"H:MM":"Dezimal")+" · nur Hinweis, solange die Kappung aus ist")
+   +feldKurz("maxWoche","Warngrenze Woche",fmtDauer(e.maxWoche),(zfHmm?"H:MM":"Dezimal")+" · nur Warnung")
+   +feldKurz("ruhezeit","Mindestruhezeit",fmtDauer(e.ruhezeit),(zfHmm?"H:MM":"Dezimal")+" · nur Warnung")
    +'</div><div class="reihe">'
-   +feldKurz("kontoMinus","Grenze Zeitschuld",fmtDauer(e.kontoMinus),"H:MM · nur Warnung")
-   +feldKurz("kontoPlus","Grenze Zeitguthaben",fmtDauer(e.kontoPlus),"H:MM · nur Warnung")
+   +feldKurz("kontoMinus","Grenze Zeitschuld",fmtDauer(e.kontoMinus),(zfHmm?"H:MM":"Dezimal")+" · nur Warnung")
+   +feldKurz("kontoPlus","Grenze Zeitguthaben",fmtDauer(e.kontoPlus),(zfHmm?"H:MM":"Dezimal")+" · nur Warnung")
    +'</div>';
 
   /* --- Zeitkonto --- */
   var b4='<div class="reihe">'
-   +feldKurz("startKonto","Anfangs-Kontostand",fmtSaldo(e.startKonto),"z. B. +12:30 oder −3:15")
+   +feldKurz("startKonto","Anfangs-Kontostand",fmtSaldo(e.startKonto),(zfHmm?"z. B. +12:30 oder −3:15":"z. B. +12,5 oder −3,3"))
    +'<div class="feld" style="flex:1;min-width:190px"><label for="stichtag">Stichtag</label><input type="date" id="stichtag" value="'+esc(e.stichtag)+'"></div></div>'
    +'<p class="hint">Der Kontostand ist der Anfangswert zuzüglich aller Tagessalden ab dem Stichtag. Tage vor dem Stichtag zählen nicht ins Konto. Ohne Stichtag bleibt das Konto beim Anfangswert stehen.</p>'
    +'<p class="hint" style="margin-top:8px"><strong>Aktueller Kontostand: '+fmtSaldo(kontostandBis(heuteKey()))+' h</strong></p>';
 
   /* --- Allgemein --- */
-  var b5='<div class="feld"><label for="land">Bundesland (Feiertage)</label><select id="land">'
+  var zfHmm=(e.zeitformat==="hmm");
+  var b5='<div class="feld"><label>Zeitanzeige</label><div class="chips">'
+   +chip("zf","dezimal","Dezimalstunden (7,8 h)",!zfHmm)
+   +chip("zf","hmm","Stunden:Minuten (7:48 h)",zfHmm)
+   +'</div><div class="sub">Dezimal wie die Stempeluhr im Amt: eine Nachkommastelle, 0,1 h = 6 Minuten. Intern wird immer minutengenau gerechnet, nur die Anzeige rundet.</div></div>'
+   +'<div class="feld"><label for="land">Bundesland (Feiertage)</label><select id="land">'
    +Object.keys(LAENDER).map(function(k){return '<option value="'+k+'"'+(k===e.land?" selected":"")+'>'+LAENDER[k]+'</option>';}).join("")
    +'</select><div class="sub">Die beweglichen Feiertage werden über die Gauß’sche Osterformel für jedes Jahr berechnet.</div></div>'
    +'<div class="feld"><label for="nameF">Name (für Begrüßung und Ausdruck)</label><input type="text" id="nameF" value="'+esc(e.name)+'" placeholder="Vorname Nachname"></div>'
@@ -2344,6 +2363,7 @@ function einstellungenEvents(){
   g("land").addEventListener("change",function(){ e.land=this.value; fertig(); });
   g("nameF").addEventListener("change",function(){ e.name=this.value.trim(); speichern(); });
   alle('input[name="theme"]',function(r){ r.addEventListener("change",function(){ e.theme=r.value; fertig(); }); });
+  alle('input[name="zf"]',function(r){ r.addEventListener("change",function(){ e.zeitformat=r.value; setzeZeitformat(r.value); fertig(); }); });
 
   g("expJson").addEventListener("click",jsonExport);
   g("impJson").addEventListener("click",function(){ g("impFile").click(); });
@@ -2358,7 +2378,7 @@ function einstellungenEvents(){
     if(!window.confirm("Letzte Rückfrage: Der gesamte Datenbestand wird gelöscht. Fortfahren?")) return;
     state=leererState();
     try{ window.localStorage.removeItem(KEY); }catch(err){}
-    speichern(); themeAnwenden(); zeichneEinstellungen();
+    speichern(); setzeZeitformat(E().zeitformat); themeAnwenden(); zeichneEinstellungen();
   });
 }
 
@@ -2406,7 +2426,7 @@ function jsonImport(ev){
       var std=standardEinstellungen();
       for(var k in std) if(p.einstellungen&&p.einstellungen[k]!==undefined) std[k]=p.einstellungen[k];
       s.einstellungen=std;
-      state=s; speichern(); themeAnwenden(); zeichneEinstellungen();
+      state=s; speichern(); setzeZeitformat(E().zeitformat); themeAnwenden(); zeichneEinstellungen();
       window.alert("Import abgeschlossen: "+n+" Tage übernommen.");
     });
     document.getElementById("impAbbruch").addEventListener("click",function(){ box.innerHTML=""; });
@@ -2497,6 +2517,7 @@ function pwaEinrichten(){
 }
 
 laden();
+setzeZeitformat(E().zeitformat);
 themeAnwenden();
 pwaEinrichten();
 window.addEventListener("hashchange",route);
